@@ -102,6 +102,9 @@ const TinyMCE = {
           editor.on('change', $.debounce ? $.debounce(tmceOnChange, 500, null,true) : tmceOnChange);
         }
       });
+      $('#input${text(nm)}').on('set_form_field', (e)=>{
+        tinymce.get("input${text(nm)}").setContent(e.target.value)
+      })
       `)
       )
     );
