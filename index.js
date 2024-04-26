@@ -91,9 +91,16 @@ const TinyMCE = {
       ),
       script(
         domReady(`
+        let tmceOnChange = ()=>{        
+          $('textarea#input${text(nm)}').closest('form').trigger('change');
+        }
+       
       tinymce.init({
         selector: '.${rndcls}',
-        promotion: false
+        promotion: false,
+        setup: (editor) => {
+          editor.on('change', $.debounce ? $.debounce(tmceOnChange, 500, null,true) : tmceOnChange);
+        }
       });
       `)
       )
