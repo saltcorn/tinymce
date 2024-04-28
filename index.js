@@ -39,7 +39,11 @@ const TinyMCE = {
       {
         name: "quickbar",
         label: "Quick Toolbar",
-        required: true,
+        type: "Bool",
+      },
+      {
+        name: "statusbar",
+        label: "Statusbar",
         type: "Bool",
       },
       /*{
@@ -104,7 +108,8 @@ const TinyMCE = {
         promotion: false,
         plugins: [${attrs?.autogrow ? `'autoresize',` : ""}${
           attrs?.quickbar ? `'quickbars',` : ""
-        }],        
+        }],
+        statusbar: ${!!attrs?.statusbar},        
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
         setup: (editor) => {
