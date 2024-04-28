@@ -36,7 +36,7 @@ const TinyMCE = {
         label: "Toolbar",
         required: true,
         type: "String",
-        attributes: { options: ["Standard", "Reduced", "Document"] },
+        attributes: { options: ["Standard", "Reduced", "Full"] },
       },
       {
         name: "quickbar",
@@ -113,13 +113,19 @@ const TinyMCE = {
       tinymce.init({
         selector: '.${rndcls}',
         promotion: false,
-        plugins: ['link','lists',${attrs?.autogrow ? `'autoresize',` : ""}${
-          attrs?.quickbar ? `'quickbars',` : ""
-        }],
+        plugins: ['link', 'fullscreen', 'charmap', 'table', 'lists', 'searchreplace',${
+          attrs?.autogrow ? `'autoresize',` : ""
+        }${attrs?.quickbar ? `'quickbars',` : ""}],
         statusbar: ${!!attrs?.statusbar},        
         menubar: ${!!attrs?.menubar},
         skin: "tinymce-5",
-        toolbar: 'undo redo styles bold italic underline strikethrough link bullist numlist alignleft aligncenter alignright alignjustify outdent indent forecolor backcolor',
+        toolbar: '${
+          attrs?.toolbar === "Reduced"
+            ? "undo redo | bold italic underline strikethrough | removeformat | link hr | bullist numlist | outdent indent | blockquote "
+            : attrs?.toolbar === "Full"
+            ? "undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link | cut copy paste pastetext | searchreplace | table hr charmap | bullist numlist | alignnone alignleft aligncenter alignright alignjustify | outdent indent | blockquote | styles fontfamily fontsize fontsizeinput | fullscreen"
+            : "undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link  | searchreplace | table hr charmap | bullist numlist | align | outdent indent | blockquote | fullscreen"
+        }',
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
         setup: (editor) => {
