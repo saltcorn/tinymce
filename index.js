@@ -29,19 +29,25 @@ const TinyMCE = {
   configFields: async () => {
     const dirs = File.allDirectories ? await File.allDirectories() : null;
     return [
-      {
+      /* {
         name: "toolbar",
         label: "Toolbar",
         required: true,
         type: "String",
         attributes: { options: ["Standard", "Reduced", "Document"] },
-      },
+      },*/
       {
+        name: "quickbar",
+        label: "Quick Toolbar",
+        required: true,
+        type: "Bool",
+      },
+      /*{
         name: "height",
         label: "Height (em units)",
         type: "Integer",
         default: 10,
-      },
+      },*/
       {
         name: "autogrow",
         label: "Auto-grow",
@@ -96,7 +102,9 @@ const TinyMCE = {
       tinymce.init({
         selector: '.${rndcls}',
         promotion: false,
-        ${attrs?.autogrow ? `plugins: 'autoresize',` : ""}
+        plugins: [${attrs?.autogrow ? `'autoresize',` : ""}${
+          attrs?.quickbar ? `'quickbars',` : ""
+        }],        
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
         setup: (editor) => {
