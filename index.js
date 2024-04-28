@@ -117,7 +117,8 @@ const TinyMCE = {
           attrs?.quickbar ? `'quickbars',` : ""
         }],
         statusbar: ${!!attrs?.statusbar},        
-        menubar: ${!!attrs?.menubar},        
+        menubar: ${!!attrs?.menubar},
+        toolbar: 'undo redo | styles | bold italic | alignleft aligncenter alignright alignjustify | outdent indent',
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
         setup: (editor) => {
