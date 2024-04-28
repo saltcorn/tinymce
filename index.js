@@ -113,12 +113,12 @@ const TinyMCE = {
       tinymce.init({
         selector: '.${rndcls}',
         promotion: false,
-        plugins: [${attrs?.autogrow ? `'autoresize',` : ""}${
+        plugins: ['link','lists',${attrs?.autogrow ? `'autoresize',` : ""}${
           attrs?.quickbar ? `'quickbars',` : ""
         }],
         statusbar: ${!!attrs?.statusbar},        
         menubar: ${!!attrs?.menubar},
-        toolbar: 'undo redo | styles | bold italic | alignleft aligncenter alignright alignjustify | outdent indent',
+        toolbar: 'undo redo styles bold italic underline strikethrough link bullist numlist alignleft aligncenter alignright alignjustify outdent indent forecolor backcolor',
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
         setup: (editor) => {
