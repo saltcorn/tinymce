@@ -144,7 +144,7 @@ const TinyMCE = {
                   reject('Image upload failed: ' + request.responseText);                
                 },
               });
-        });`
+        })`
             : ""
         }
       });
