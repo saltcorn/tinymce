@@ -124,10 +124,11 @@ const TinyMCE = {
           editor.on('change', $.debounce ? $.debounce(tmceOnChange, 500, null,true) : tmceOnChange);
         },
         ${
-          typeof attrs?.folder && attrs?.folder !== "Base64 encode"
+          typeof attrs?.folder === "string" && attrs.folder !== "Base64 encode"
             ? `images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
               const formData = new FormData();
               formData.append('file', blobInfo.blob(), blobInfo.filename());
+              formData.append('folder', ${JSON.stringify(attrs.folder)});
               $.ajax("/files/upload", {
                 type: "POST",
                 headers: {
