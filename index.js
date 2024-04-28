@@ -128,7 +128,7 @@ const TinyMCE = {
             ? `images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
               const formData = new FormData();
               formData.append('file', blobInfo.blob(), blobInfo.filename());
-              $.ajax(url, {
+              $.ajax("/files/upload", {
                 type: "POST",
                 headers: {
                   "CSRF-Token": _sc_globalCsrf,
@@ -137,8 +137,7 @@ const TinyMCE = {
                 processData: false,
                 contentType: false,
                 success: function (res) {
-                  console.log("upload res", res)
-                  resolve("")
+                  resolve(res.success.url)
                 },
                 error: function (request) {
                   reject('Image upload failed: ' + request.responseText);                
