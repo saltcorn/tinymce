@@ -31,13 +31,13 @@ const TinyMCE = {
     const folderOpts = [...dirs.map((d) => d.path_to_serve), "Base64 encode"];
     //console.log({ dirs, folderOpts });
     return [
-      /* {
+      {
         name: "toolbar",
         label: "Toolbar",
         required: true,
         type: "String",
         attributes: { options: ["Standard", "Reduced", "Document"] },
-      },*/
+      },
       {
         name: "quickbar",
         label: "Quick Toolbar",
@@ -118,6 +118,7 @@ const TinyMCE = {
         }],
         statusbar: ${!!attrs?.statusbar},        
         menubar: ${!!attrs?.menubar},
+        skin: "tinymce-5",
         toolbar: 'undo redo styles bold italic underline strikethrough link bullist numlist alignleft aligncenter alignright alignjustify outdent indent forecolor backcolor',
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
