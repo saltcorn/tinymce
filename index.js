@@ -28,6 +28,8 @@ const TinyMCE = {
   handlesTextStyle: true,
   configFields: async () => {
     const dirs = File.allDirectories ? await File.allDirectories() : null;
+    const folderOpts = [...dirs.map((d) => d.path_to_serve), "Base64 encode"];
+    //console.log({ dirs, folderOpts });
     return [
       /* {
         name: "toolbar",
@@ -79,7 +81,7 @@ const TinyMCE = {
               label: "Folder for uploaded media files",
               type: "String",
               attributes: {
-                options: [...dirs.map((d) => d.path_to_serve), "Base64 encode"],
+                options: folderOpts,
               },
             },
           ]
@@ -120,6 +122,30 @@ const TinyMCE = {
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
         setup: (editor) => {
           editor.on('change', $.debounce ? $.debounce(tmceOnChange, 500, null,true) : tmceOnChange);
+        },
+        ${
+          typeof attrs?.folder && attrs?.folder !== "Base64 encode"
+            ? `images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
+              const formData = new FormData();
+              formData.append('file', blobInfo.blob(), blobInfo.filename());
+              $.ajax(url, {
+                type: "POST",
+                headers: {
+                  "CSRF-Token": _sc_globalCsrf,
+                },
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                  console.log("upload res", res)
+                  resolve("")
+                },
+                error: function (request) {
+                  reject('Image upload failed: ' + request.responseText);                
+                },
+              });
+        });`
+            : ""
         }
       });
       $('#input${text(nm)}').on('set_form_field', (e)=>{
