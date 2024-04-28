@@ -43,7 +43,12 @@ const TinyMCE = {
       },
       {
         name: "statusbar",
-        label: "Statusbar",
+        label: "Status bar",
+        type: "Bool",
+      },
+      {
+        name: "menubar",
+        label: "Menu bar",
         type: "Bool",
       },
       /*{
@@ -110,6 +115,7 @@ const TinyMCE = {
           attrs?.quickbar ? `'quickbars',` : ""
         }],
         statusbar: ${!!attrs?.statusbar},        
+        menubar: ${!!attrs?.menubar},        
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
         setup: (editor) => {
