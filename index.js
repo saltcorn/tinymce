@@ -51,13 +51,11 @@ const TinyMCE = {
         name: "minheight",
         label: "Min height (px)",
         type: "Integer",
-        showIf: { autogrow: true },
       },
       {
         name: "maxheight",
         label: "Max height (px)",
         type: "Integer",
-        showIf: { autogrow: true },
       },
       ...(dirs
         ? [
@@ -98,6 +96,9 @@ const TinyMCE = {
       tinymce.init({
         selector: '.${rndcls}',
         promotion: false,
+        ${attrs?.autogrow ? `plugins: 'autoresize',` : ""}
+        ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
+        ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
         setup: (editor) => {
           editor.on('change', $.debounce ? $.debounce(tmceOnChange, 500, null,true) : tmceOnChange);
         }
