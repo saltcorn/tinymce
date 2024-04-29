@@ -105,12 +105,12 @@ const TinyMCE = {
         text(v || "")
       ),
       script(
-        domReady(`setTimeout(async ()=>{
-        let tmceOnChange = ()=>{        
-          $('textarea#input${text(
-            nm
-          )}_${rndcls}').closest('form').trigger('change');
-        }       
+        domReady(`setTimeout(async ()=>{      
+      let tmceOnChange = ()=>{        
+        $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
+          nm
+        )}_${rndcls}").getContent()).closest('form').trigger('change');
+      }            
       const ed = await tinymce.init({
         selector: '.${rndcls}',
         promotion: false,
@@ -156,7 +156,8 @@ const TinyMCE = {
         })`
             : ""
         }
-      });      
+      }); 
+    
       $('#input${text(nm)}_${rndcls}').on('set_form_field', (e)=>{
         ed[0].setContent(e.target.value)
       })
