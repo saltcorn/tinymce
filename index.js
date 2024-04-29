@@ -105,12 +105,11 @@ const TinyMCE = {
         text(v || "")
       ),
       script(
-        domReady(`
+        domReady(`setTimeout(async ()=>{
         let tmceOnChange = ()=>{        
           $('textarea#input${text(nm)}').closest('form').trigger('change');
-        }
-       
-      tinymce.init({
+        }       
+      const ed = await tinymce.init({
         selector: '.${rndcls}',
         promotion: false,
         plugins: ['link', 'fullscreen', 'charmap', 'table', 'lists', 'searchreplace',${
@@ -155,11 +154,11 @@ const TinyMCE = {
         })`
             : ""
         }
-      });
+      });      
       $('#input${text(nm)}').on('set_form_field', (e)=>{
-        tinymce.get("input${text(nm)}").setContent(e.target.value)
+        ed[0].setContent(e.target.value)
       })
-      `)
+    },0)`)
       )
     );
   },
