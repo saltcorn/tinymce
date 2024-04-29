@@ -98,7 +98,7 @@ const TinyMCE = {
       textarea(
         {
           name: text(nm),
-          id: `input${text(nm)}`,
+          id: `input${text(nm)}_${rndcls}`,
           rows: 10,
           class: rndcls,
         },
@@ -107,7 +107,9 @@ const TinyMCE = {
       script(
         domReady(`setTimeout(async ()=>{
         let tmceOnChange = ()=>{        
-          $('textarea#input${text(nm)}').closest('form').trigger('change');
+          $('textarea#input${text(
+            nm
+          )}_${rndcls}').closest('form').trigger('change');
         }       
       const ed = await tinymce.init({
         selector: '.${rndcls}',
@@ -155,7 +157,7 @@ const TinyMCE = {
             : ""
         }
       });      
-      $('#input${text(nm)}').on('set_form_field', (e)=>{
+      $('#input${text(nm)}_${rndcls}').on('set_form_field', (e)=>{
         ed[0].setContent(e.target.value)
       })
     },0)`)
