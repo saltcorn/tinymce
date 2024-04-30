@@ -101,6 +101,7 @@ const TinyMCE = {
           id: `input${text(nm)}_${rndcls}`,
           rows: 10,
           class: rndcls,
+          "data-postprocess": "$e.text()",
         },
         text(v || "")
       ),
