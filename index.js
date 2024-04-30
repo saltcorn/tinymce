@@ -9,6 +9,8 @@ const {
 } = require("@saltcorn/markup/tags");
 const { features } = require("@saltcorn/data/db/state");
 const File = require("@saltcorn/data/models/file");
+const User = require("@saltcorn/data/models/user");
+
 const headers = [
   {
     script: `/plugins/public/tinymce${
@@ -30,6 +32,8 @@ const TinyMCE = {
     const dirs = File.allDirectories ? await File.allDirectories() : null;
     const folderOpts = [...dirs.map((d) => d.path_to_serve), "Base64 encode"];
     //console.log({ dirs, folderOpts });
+    const roles = await User.get_roles();
+
     return [
       {
         name: "toolbar",
@@ -86,6 +90,12 @@ const TinyMCE = {
             },
           ]
         : []),
+      {
+        name: "min_role_read",
+        label: "Min role read files",
+        input_type: "select",
+        options: roles.map((r) => ({ value: r.id, label: r.role })),
+      },
     ];
   },
   run: (nm, v, attrs, cls) => {
@@ -138,6 +148,9 @@ const TinyMCE = {
             ? `images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
               const formData = new FormData();
               formData.append('file', blobInfo.blob(), blobInfo.filename());
+              formData.append('min_role_read', ${
+                attrs?.min_role_read || public_user_role
+              } );
               formData.append('folder', ${JSON.stringify(attrs.folder)});
               $.ajax("/files/upload", {
                 type: "POST",
