@@ -121,7 +121,8 @@ const TinyMCE = {
         $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
           nm
         )}_${rndcls}").getContent()).closest('form').trigger('change');
-      }            
+      } 
+      let changeDebounced = $.debounce ? $.debounce(tmceOnChange, 500, null,true) : tmceOnChange;
       const ed = await tinymce.init({
         selector: '.${rndcls}',
         promotion: false,
@@ -141,7 +142,7 @@ const TinyMCE = {
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
         setup: (editor) => {
-          editor.on('change', $.debounce ? $.debounce(tmceOnChange, 500, null,true) : tmceOnChange);
+          editor.on('Paste Change input Undo Redo', changeDebounced);
         },
         ${
           typeof attrs?.folder === "string" && attrs.folder !== "Base64 encode"
