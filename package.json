@@ -1,6 +1,6 @@
 {
   "name": "@saltcorn/tinymce",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "tinymce editor for HTML fields",
   "main": "index.js",
   "dependencies": {
