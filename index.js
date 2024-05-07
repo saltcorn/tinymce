@@ -117,6 +117,11 @@ const TinyMCE = {
       ),
       script(
         domReady(`setTimeout(async ()=>{      
+      let tmceUpdateTextarea = ()=>{        
+        $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
+          nm
+        )}_${rndcls}").getContent());
+      } 
       let tmceOnChange = ()=>{        
         $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
           nm
@@ -142,7 +147,10 @@ const TinyMCE = {
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
         setup: (editor) => {
-          editor.on('Paste Change input Undo Redo', changeDebounced);
+          editor.on('Paste Change input Undo Redo', ()=>{
+            tmceUpdateTextarea()
+            changeDebounced()
+          });
         },
         ${
           typeof attrs?.folder === "string" && attrs.folder !== "Base64 encode"
