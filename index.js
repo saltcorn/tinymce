@@ -125,7 +125,8 @@ const TinyMCE = {
       let tmceOnChange = ()=>{        
         $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
           nm
-        )}_${rndcls}").getContent()).closest('form').trigger('change');
+        )}_${rndcls}").getContent());
+        $('textarea#input${text(nm)}_${rndcls}').trigger('change');
       } 
       let changeDebounced = $.debounce ? $.debounce(tmceOnChange, 500, null,true) : tmceOnChange;
       const ed = await tinymce.init({
