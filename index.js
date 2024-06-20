@@ -137,6 +137,11 @@ const TinyMCE = {
         }${attrs?.quickbar ? `'quickbars',` : ""}],
         statusbar: ${!!attrs?.statusbar},        
         menubar: ${!!attrs?.menubar},
+        ${
+          attrs?.quickbar
+            ? `quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote | forecolor backcolor',`
+            : ""
+        }
         skin: "tinymce-5",
         toolbar: '${
           attrs?.toolbar === "Reduced"
