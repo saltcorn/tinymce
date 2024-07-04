@@ -35,14 +35,23 @@ const clickToEdit = {
   isEdit: true,
   blockDisplay: true,
   handlesTextStyle: true,
-  configFields: standardConfigFields,
+  configFields: async () => {
+    const stdFields = await standardConfigFields();
+    return [
+      ...stdFields,
+      {
+        name: "max_init_height",
+        label: "Max initial height (px)",
+        type: "Integer",
+      },
+    ];
+  },
   run: (nm, v, attrs, cls, required, field) => {
     const rndcls = `tmce${Math.floor(Math.random() * 16777215).toString(16)}`;
 
     const s = xss(v || "")
       .split("<blockquote>")
       .join('<blockquote class="blockquote">');
-    console.log({ s, v });
     return div(
       { id: rndcls },
       textarea(
@@ -56,7 +65,18 @@ const clickToEdit = {
         },
         text(v || "")
       ),
-      div({ class: "htmlvalue" }, s),
+      div(
+        {
+          class: "htmlvalue",
+          onclick: attrs.max_init_height
+            ? `toggle_expand_${rndcls}()`
+            : undefined,
+          style: attrs.max_init_height
+            ? { maxHeight: `${attrs.max_init_height}px`, overflowY: "hidden" }
+            : undefined,
+        },
+        s
+      ),
       button(
         {
           type: "button",
@@ -67,6 +87,18 @@ const clickToEdit = {
       ),
       script(`
         let is_init_${rndcls} = false;
+        let expanded_${rndcls} = false;
+        function toggle_expand_${rndcls}() {
+          if(expanded_${rndcls}) {
+           $("div#${rndcls} div.htmlvalue").css("max-height", "${
+        attrs.max_init_height
+      }px");
+           expanded_${rndcls} = false;
+          } else {
+           $("div#${rndcls} div.htmlvalue").css("max-height", "");
+           expanded_${rndcls} = true;
+          }
+        }
         async function click_to_tinymce_${rndcls}() {
         $("div#${rndcls} div.htmlvalue").hide();
         $("div#${rndcls} textarea#input${text(nm)}_${rndcls}").show();
