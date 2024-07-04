@@ -77,6 +77,11 @@ const clickToEdit = {
         },
         s
       ),
+      attrs.max_init_height &&
+        div(
+          { class: "moreindicator", onclick: `toggle_expand_${rndcls}()` },
+          "More..."
+        ),
       button(
         {
           type: "button",
@@ -93,10 +98,14 @@ const clickToEdit = {
            $("div#${rndcls} div.htmlvalue").css("max-height", "${
         attrs.max_init_height
       }px");
+           $("div#${rndcls} div.moreindicator").show();
            expanded_${rndcls} = false;
           } else {
            $("div#${rndcls} div.htmlvalue").css("max-height", "");
            expanded_${rndcls} = true;
+           $("div#${rndcls} div.moreindicator").hide();
+
+
           }
         }
         async function click_to_tinymce_${rndcls}() {
@@ -106,6 +115,7 @@ const clickToEdit = {
         $("div#${rndcls} button.clicktinybtn").attr("onclick", "click_to_tinymce_done_${rndcls}()");
         if(is_init_${rndcls}) {
          tinymce.get("input${text(nm)}_${rndcls}").show();
+           $("div#${rndcls} div.moreindicator").hide();
         } else {
 
           is_init_${rndcls} = true;
@@ -120,6 +130,9 @@ const clickToEdit = {
         $("div#${rndcls} button.clicktinybtn").attr("onclick", "click_to_tinymce_${rndcls}()");
         tinymce.get("input${text(nm)}_${rndcls}").hide();
         $("div#${rndcls} textarea#input${text(nm)}_${rndcls}").hide();
+        if(!expanded_${rndcls}) 
+           $("div#${rndcls} div.moreindicator").show();
+
 
         }`)
     );
