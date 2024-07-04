@@ -4,7 +4,8 @@
   "description": "tinymce editor for HTML fields",
   "main": "index.js",
   "dependencies": {
-    "@saltcorn/markup": "^0.3.0"
+    "@saltcorn/markup": "^0.3.0",
+    "xss": "^1.0.6"
   },
   "author": "Tom Nielsen",
   "license": "MIT",
