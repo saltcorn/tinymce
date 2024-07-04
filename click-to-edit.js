@@ -1,4 +1,4 @@
-const { standardConfigFields } = require("./common");
+const { standardConfigFields, initTiny } = require("./common");
 const {
   input,
   div,
@@ -47,19 +47,16 @@ const clickToEdit = {
       { id: rndcls },
       textarea(
         {
-          class: ["form-control", cls],
+          name: text(nm),
+          id: `input${text(nm)}_${rndcls}`,
+          rows: 10,
           style: "display: none",
-          name: text_attr(nm),
-          "data-fieldname": text_attr(field.name),
-          placeholder: attrs.placeholder,
-          spellcheck: attrs.spellcheck === false ? "false" : undefined,
-
-          id: `input${text_attr(nm)}`,
-          rows: attrs.rows || 5,
+          class: rndcls,
+          "data-postprocess": "$e.text()",
         },
-        s
+        text(v || "")
       ),
-      div(s),
+      div({ class: "htmlvalue" }, s),
       button(
         {
           type: "button",
@@ -68,18 +65,30 @@ const clickToEdit = {
         },
         "Edit"
       ),
-      script(`async function click_to_tinymce_${rndcls}(btn_e) {
-        $("div#${rndcls} div").hide();
+      script(`
+        let is_init_${rndcls} = false;
+        async function click_to_tinymce_${rndcls}(btn_e) {
+        $("div#${rndcls} div.htmlvalue").hide();
         $("div#${rndcls} textarea").show();
         $("div#${rndcls} button").text("Done");
         $("div#${rndcls} button").attr("onclick", "click_to_tinymce_done_${rndcls}()");
+        if(is_init_${rndcls}) {
+         tinymce.get("input${text(nm)}_${rndcls}").show();
+        } else {
 
+          is_init_${rndcls} = true;
+          ${initTiny(nm, rndcls, attrs)}
+        }
         }
         function click_to_tinymce_done_${rndcls}() {
-        $("div#${rndcls} div").show(); // TODO set contents
+        $("div#${rndcls} div.htmlvalue").show().html(tinymce.get("input${text(
+        nm
+      )}_${rndcls}").getContent());
         $("div#${rndcls} textarea").hide();
         $("div#${rndcls} button").text("Edit");
         $("div#${rndcls} button").attr("onclick", "click_to_tinymce_${rndcls}()");
+        tinymce.get("input${text(nm)}_${rndcls}").hide();
+        $("div#${rndcls} textarea").hide();
 
         }`)
     );
