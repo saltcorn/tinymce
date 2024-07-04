@@ -61,17 +61,17 @@ const clickToEdit = {
         {
           type: "button",
           onclick: `click_to_tinymce_${rndcls}()`,
-          class: "btn btn-primary btn-sm",
+          class: "btn btn-primary btn-sm clicktinybtn",
         },
         "Edit"
       ),
       script(`
         let is_init_${rndcls} = false;
-        async function click_to_tinymce_${rndcls}(btn_e) {
+        async function click_to_tinymce_${rndcls}() {
         $("div#${rndcls} div.htmlvalue").hide();
-        $("div#${rndcls} textarea").show();
-        $("div#${rndcls} button").text("Done");
-        $("div#${rndcls} button").attr("onclick", "click_to_tinymce_done_${rndcls}()");
+        $("div#${rndcls} textarea#input${text(nm)}_${rndcls}").show();
+        $("div#${rndcls} button.clicktinybtn").text("Done");
+        $("div#${rndcls} button.clicktinybtn").attr("onclick", "click_to_tinymce_done_${rndcls}()");
         if(is_init_${rndcls}) {
          tinymce.get("input${text(nm)}_${rndcls}").show();
         } else {
@@ -84,11 +84,10 @@ const clickToEdit = {
         $("div#${rndcls} div.htmlvalue").show().html(tinymce.get("input${text(
         nm
       )}_${rndcls}").getContent());
-        $("div#${rndcls} textarea").hide();
-        $("div#${rndcls} button").text("Edit");
-        $("div#${rndcls} button").attr("onclick", "click_to_tinymce_${rndcls}()");
+        $("div#${rndcls} button.clicktinybtn").text("Edit");
+        $("div#${rndcls} button.clicktinybtn").attr("onclick", "click_to_tinymce_${rndcls}()");
         tinymce.get("input${text(nm)}_${rndcls}").hide();
-        $("div#${rndcls} textarea").hide();
+        $("div#${rndcls} textarea#input${text(nm)}_${rndcls}").hide();
 
         }`)
     );
