@@ -84,7 +84,10 @@ const clickToEdit = {
           { class: "col" },
           attrs.max_init_height &&
             div(
-              { class: "moreindicator", onclick: `toggle_expand_${rndcls}()` },
+              {
+                class: "moreindicator fst-italic fw-semibold",
+                onclick: `toggle_expand_${rndcls}()`,
+              },
               "More..."
             )
         ),
@@ -123,7 +126,7 @@ const clickToEdit = {
         async function click_to_tinymce_${rndcls}() {
         $("div#${rndcls} div.htmlvalue").hide();
         $("div#${rndcls} textarea#input${text(nm)}_${rndcls}").show();
-        $("div#${rndcls} button.clicktinybtn").text("Done");
+        $("div#${rndcls} button.clicktinybtn").html('<i class="fas fa-check me-2"></i>Done');
         $("div#${rndcls} button.clicktinybtn").attr("onclick", "click_to_tinymce_done_${rndcls}()");
         if(is_init_${rndcls}) {
          tinymce.get("input${text(nm)}_${rndcls}").show();
@@ -138,7 +141,7 @@ const clickToEdit = {
         $("div#${rndcls} div.htmlvalue").show().html(tinymce.get("input${text(
         nm
       )}_${rndcls}").getContent());
-        $("div#${rndcls} button.clicktinybtn").text("Edit");
+        $("div#${rndcls} button.clicktinybtn").html('<i class="fas fa-edit me-2"></i>Edit');
         $("div#${rndcls} button.clicktinybtn").attr("onclick", "click_to_tinymce_${rndcls}()");
         tinymce.get("input${text(nm)}_${rndcls}").hide();
         $("div#${rndcls} textarea#input${text(nm)}_${rndcls}").hide();
