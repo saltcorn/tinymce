@@ -104,8 +104,14 @@ const clickToEdit = {
           )
         )
       ),
-
-      script(`
+      attrs.max_init_height &&
+        script(
+          domReady(`
+          const realHeight = $("div#${rndcls} div.htmlvalue")[0].scrollHeight;
+          if(realHeight <= ${attrs.max_init_height}) 
+            $("div#${rndcls} div.moreindicator").remove();`)
+        ),
+      script(`        
         let is_init_${rndcls} = false;
         let expanded_${rndcls} = false;
         function toggle_expand_${rndcls}() {
