@@ -79,7 +79,7 @@ const clickToEdit = {
         s
       ),
       div(
-        { class: "row" },
+        { class: "row mt-1" },
         div(
           { class: "col" },
           attrs.max_init_height &&
@@ -97,7 +97,7 @@ const clickToEdit = {
             {
               type: "button",
               onclick: `click_to_tinymce_${rndcls}()`,
-              class: "btn btn-primary btn-sm clicktinybtn",
+              class: "mt-1 btn btn-primary btn-sm clicktinybtn",
             },
             i({ class: "far fa-edit me-2" }),
             "Edit"
