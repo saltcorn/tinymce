@@ -128,11 +128,10 @@ const clickToEdit = {
         $("div#${rndcls} textarea#input${text(nm)}_${rndcls}").show();
         $("div#${rndcls} button.clicktinybtn").html('<i class="fas fa-check me-2"></i>Done');
         $("div#${rndcls} button.clicktinybtn").attr("onclick", "click_to_tinymce_done_${rndcls}()");
+           $("div#${rndcls} div.moreindicator").hide();
         if(is_init_${rndcls}) {
          tinymce.get("input${text(nm)}_${rndcls}").show();
-           $("div#${rndcls} div.moreindicator").hide();
         } else {
-
           is_init_${rndcls} = true;
           ${initTiny(nm, rndcls, attrs)}
         }
