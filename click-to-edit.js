@@ -9,6 +9,7 @@ const {
   style,
   text_attr,
   button,
+  i,
 } = require("@saltcorn/markup/tags");
 const xss = require("xss");
 xss.whiteList.kbd = [];
@@ -77,19 +78,30 @@ const clickToEdit = {
         },
         s
       ),
-      attrs.max_init_height &&
+      div(
+        { class: "row" },
         div(
-          { class: "moreindicator", onclick: `toggle_expand_${rndcls}()` },
-          "More..."
+          { class: "col" },
+          attrs.max_init_height &&
+            div(
+              { class: "moreindicator", onclick: `toggle_expand_${rndcls}()` },
+              "More..."
+            )
         ),
-      button(
-        {
-          type: "button",
-          onclick: `click_to_tinymce_${rndcls}()`,
-          class: "btn btn-primary btn-sm clicktinybtn",
-        },
-        "Edit"
+        div(
+          { class: "col text-end" },
+          button(
+            {
+              type: "button",
+              onclick: `click_to_tinymce_${rndcls}()`,
+              class: "btn btn-primary btn-sm clicktinybtn",
+            },
+            i({ class: "far fa-edit me-2" }),
+            "Edit"
+          )
+        )
       ),
+
       script(`
         let is_init_${rndcls} = false;
         let expanded_${rndcls} = false;
