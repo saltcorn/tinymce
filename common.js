@@ -41,7 +41,8 @@ const initTiny = (nm, rndcls, attrs) => `
             ? `quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote | forecolor backcolor',`
             : ""
         }
-        skin: "tinymce-5",
+        skin: window._sc_lightmode==="dark" ? "tinymce-5-dark" : "tinymce-5",
+        content_css: window._sc_lightmode==="dark" ? "dark" : "default",
         toolbar: '${
           attrs?.toolbar === "Reduced"
             ? "undo redo | bold italic underline strikethrough | removeformat | link hr | bullist numlist | outdent indent | blockquote "
