@@ -34,7 +34,7 @@ const initTiny = (nm, rndcls, attrs) => `
         attrs.folder !== ""
       }, ${attrs?.min_role_read || public_user_role}));
       const ed = await tinymce.init({
-        extended_valid_elements: 'div[*]',
+        extended_valid_elements: 'div[*],img[*]',
         valid_children: ['+div[img]'],
         selector: '.${rndcls}',
         promotion: false,

@@ -116,12 +116,21 @@ async function drawEventExport(message) {
       `<div drawio-diagram contenteditable="false" id="${wrapId}"><img src="${message.data}" id="${imgId}"></div>`
     );
     if (_uploadDrawings) {
-      setTimeout(() => {
+      // wait 10 times 500 ms for the image to be uploaded and updated by tinymce
+      let tries = 10;
+      const interval = setInterval(() => {
         const img = pageEditor.dom.get(imgId);
-        const src = img.getAttribute("src");
-        pageEditor.dom.setAttrib(wrapId, "drawio-diagram", src);
-        drawEventClose();
-      }, 1000);
+        const src = img?.getAttribute("src");
+        if (src?.startsWith("/files/serve")) {
+          clearInterval(interval);
+          pageEditor.dom.setAttrib(wrapId, "drawio-diagram", src);
+          drawEventClose();
+        }
+        if (--tries === 0) {
+          clearInterval(interval);
+          drawEventClose();
+        }
+      }, 500);
     } else drawEventClose();
   }
 }
@@ -138,8 +147,6 @@ function drawPostMessage(data) {
 }
 
 async function drawReceive(event) {
-  console.log(event);
-
   if (!event.data || event.data.length < 1) return;
   if (event.origin !== approvedOrigin) return;
 
