@@ -35,7 +35,7 @@ const initTiny = (nm, rndcls, attrs) => `
       }, ${attrs?.min_role_read || public_user_role}));
       const ed = await tinymce.init({
         extended_valid_elements: 'div[*]',
-        valid_children: ['+div[pre|img]'],
+        valid_children: ['+div[img]'],
         selector: '.${rndcls}',
         promotion: false,
         plugins: [ 'drawio', 'link', 'fullscreen', 'charmap', 'table', 'lists', 'searchreplace',${
@@ -54,8 +54,8 @@ const initTiny = (nm, rndcls, attrs) => `
           attrs?.toolbar === "Reduced"
             ? "undo redo | bold italic underline strikethrough | removeformat | link hr | bullist numlist | outdent indent | blockquote "
             : attrs?.toolbar === "Full"
-            ? "undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link | cut copy paste pastetext | searchreplace | table hr charmap | bullist numlist | alignnone alignleft aligncenter alignright alignjustify | outdent indent | blockquote | styles fontfamily fontsize fontsizeinput | fullscreen | drawio"
-            : "undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link  | searchreplace | table hr charmap | bullist numlist | align | outdent indent | blockquote | fullscreen | drawio"
+            ? "undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link | cut copy paste pastetext | searchreplace | table hr charmap | drawio | bullist numlist | alignnone alignleft aligncenter alignright alignjustify | outdent indent | blockquote | styles fontfamily fontsize fontsizeinput | fullscreen"
+            : "undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link  | searchreplace | table hr charmap | drawio | bullist numlist | align | outdent indent | blockquote | fullscreen"
         }',
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
