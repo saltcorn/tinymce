@@ -57,7 +57,10 @@ const TinyMCE = {
           class: rndcls,
           "data-postprocess": "$e.text()",
         },
-        text(v || "", { div: ["drawio-diagram", "id"] })
+        text(
+          v || "",
+          attrs?.include_drawio ? { div: ["drawio-diagram", "id"] } : undefined
+        )
       ),
       script(
         domReady(`setTimeout(async ()=>{      
