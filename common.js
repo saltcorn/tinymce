@@ -28,12 +28,25 @@ const initTiny = (nm, rndcls, attrs) => `
         $('textarea#input${text(nm)}_${rndcls}').trigger('change');
       } 
       let changeDebounced = $.debounce ? $.debounce(tmceOnChange, 500, null,true) : tmceOnChange;
+      ${
+        attrs?.include_drawio
+          ? `window.tinymce.PluginManager.add('drawio', getDrawioPlugin(${
+              typeof attrs?.folder === "string" &&
+              attrs.folder !== "Base64 encode" &&
+              attrs.folder !== ""
+            }, ${attrs?.min_role_read || public_user_role}));`
+          : ""
+      }
       const ed = await tinymce.init({
+        extended_valid_elements: 'div[*],img[*]',
+        valid_children: ['+div[img]'],
         selector: '.${rndcls}',
         promotion: false,
-        plugins: ['link', 'fullscreen', 'charmap', 'table', 'lists', 'searchreplace',${
-          attrs?.autogrow ? `'autoresize',` : ""
-        }${attrs?.quickbar ? `'quickbars',` : ""}],
+        plugins: [ ${
+          attrs?.include_drawio ? `'drawio',` : ""
+        } 'link', 'fullscreen', 'charmap', 'table', 'lists', 'searchreplace',${
+  attrs?.autogrow ? `'autoresize',` : ""
+}${attrs?.quickbar ? `'quickbars',` : ""}],
         statusbar: ${!!attrs?.statusbar},        
         menubar: ${!!attrs?.menubar},
         ${
@@ -47,8 +60,12 @@ const initTiny = (nm, rndcls, attrs) => `
           attrs?.toolbar === "Reduced"
             ? "undo redo | bold italic underline strikethrough | removeformat | link hr | bullist numlist | outdent indent | blockquote "
             : attrs?.toolbar === "Full"
-            ? "undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link | cut copy paste pastetext | searchreplace | table hr charmap | bullist numlist | alignnone alignleft aligncenter alignright alignjustify | outdent indent | blockquote | styles fontfamily fontsize fontsizeinput | fullscreen"
-            : "undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link  | searchreplace | table hr charmap | bullist numlist | align | outdent indent | blockquote | fullscreen"
+            ? `undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link | cut copy paste pastetext | searchreplace | table hr charmap | ${
+                attrs?.include_drawio ? "drawio | " : ""
+              }bullist numlist | alignnone alignleft aligncenter alignright alignjustify | outdent indent | blockquote | styles fontfamily fontsize fontsizeinput | fullscreen`
+            : `undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link  | searchreplace | table hr charmap | ${
+                attrs?.include_drawio ? "drawio | " : ""
+              }bullist numlist | align | outdent indent | blockquote | fullscreen`
         }',
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
@@ -59,8 +76,11 @@ const initTiny = (nm, rndcls, attrs) => `
           });
         },
         ${
-          typeof attrs?.folder === "string" && attrs.folder !== "Base64 encode"
+          typeof attrs?.folder === "string" &&
+          attrs.folder !== "Base64 encode" &&
+          attrs.folder !== ""
             ? `images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
+              console.log(progress)
               const formData = new FormData();
               formData.append('file', blobInfo.blob(), blobInfo.filename());
               formData.append('min_role_read', ${
@@ -83,7 +103,14 @@ const initTiny = (nm, rndcls, attrs) => `
                 },
               });
         })`
-            : ""
+            : `images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
+              // as base64
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                resolve(e.target.result);
+              };
+              reader.readAsDataURL(blobInfo.blob());
+            })`
         }
       }); 
     
@@ -131,6 +158,13 @@ const standardConfigFields = async () => {
       name: "autogrow",
       label: "Auto-grow",
       type: "Bool",
+    },
+    {
+      name: "include_drawio",
+      // previously "drawio",
+      label: "Include diagrams.net",
+      type: "Bool",
+      default: false,
     },
     {
       name: "minheight",

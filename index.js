@@ -20,6 +20,20 @@ const headers = [
         : ""
     }/tinymce.min.js`,
   },
+  {
+    script: `/plugins/public/tinymce${
+      features?.version_plugin_serve_path
+        ? "@" + require("./package.json").version
+        : ""
+    }/drawio_plugin.js`,
+  },
+  {
+    css: `/plugins/public/tinymce${
+      features?.version_plugin_serve_path
+        ? "@" + require("./package.json").version
+        : ""
+    }/tiny_styles.css`,
+  },
 ];
 
 const TinyMCE = {
@@ -43,7 +57,10 @@ const TinyMCE = {
           class: rndcls,
           "data-postprocess": "$e.text()",
         },
-        text(v || "")
+        text(
+          v || "",
+          attrs?.include_drawio ? { div: ["drawio-diagram", "id"] } : undefined
+        )
       ),
       script(
         domReady(`setTimeout(async ()=>{      

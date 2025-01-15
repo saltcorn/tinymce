@@ -64,7 +64,10 @@ const clickToEdit = {
           class: rndcls,
           "data-postprocess": "$e.text()",
         },
-        text(v || "")
+        text(
+          v || "",
+          attrs?.include_drawio ? { div: ["drawio-diagram", "id"] } : undefined
+        )
       ),
       div(
         {
