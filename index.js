@@ -9,7 +9,11 @@ const {
 } = require("@saltcorn/markup/tags");
 const File = require("@saltcorn/data/models/file");
 const User = require("@saltcorn/data/models/user");
-const { standardConfigFields, initTiny } = require("./common");
+const {
+  standardConfigFields,
+  initTiny,
+  encodeAmpersands,
+} = require("./common");
 const { features } = require("@saltcorn/data/db/state");
 
 const headers = [
@@ -58,7 +62,7 @@ const TinyMCE = {
           "data-postprocess": "$e.text()",
         },
         text(
-          v || "",
+          attrs?.include_drawio ? encodeAmpersands(v) : v || "",
           attrs?.include_drawio ? { div: ["drawio-diagram", "id"] } : undefined
         )
       ),

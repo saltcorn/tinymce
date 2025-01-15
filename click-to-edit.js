@@ -1,4 +1,8 @@
-const { standardConfigFields, initTiny } = require("./common");
+const {
+  standardConfigFields,
+  initTiny,
+  encodeAmpersands,
+} = require("./common");
 const {
   input,
   div,
@@ -50,9 +54,11 @@ const clickToEdit = {
   run: (nm, v, attrs, cls, required, field) => {
     const rndcls = `tmce${Math.floor(Math.random() * 16777215).toString(16)}`;
 
-    const s = xss(v || "")
-      .split("<blockquote>")
-      .join('<blockquote class="blockquote">');
+    const s = attrs?.include_drawio
+      ? v || ""
+      : xss(v || "")
+          .split("<blockquote>")
+          .join('<blockquote class="blockquote">');
     return div(
       { id: rndcls },
       textarea(
@@ -65,7 +71,7 @@ const clickToEdit = {
           "data-postprocess": "$e.text()",
         },
         text(
-          v || "",
+          attrs?.include_drawio ? encodeAmpersands(v) : v || "",
           attrs?.include_drawio ? { div: ["drawio-diagram", "id"] } : undefined
         )
       ),
