@@ -15,6 +15,14 @@ const {
 const { features } = require("@saltcorn/data/db/state");
 const public_user_role = features?.public_user_role || 10;
 
+const encodeAmpersands = (str) => {
+  if (!str) return "";
+  return str
+    .replace(/&quot;/g, "&amp;quot;")
+    .replace(/&lt;/g, "&amp;lt;")
+    .replace(/&gt;/g, "&amp;gt;");
+};
+
 const initTiny = (nm, rndcls, attrs) => `
       let tmceUpdateTextarea = ()=>{        
         $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
@@ -31,15 +39,13 @@ const initTiny = (nm, rndcls, attrs) => `
       ${
         attrs?.include_drawio
           ? `window.tinymce.PluginManager.add('drawio', getDrawioPlugin(${
-              typeof attrs?.folder === "string" &&
-              attrs.folder !== "Base64 encode" &&
-              attrs.folder !== ""
-            }, ${attrs?.min_role_read || public_user_role}));`
+              attrs?.min_role_read || public_user_role
+            }));`
           : ""
       }
       const ed = await tinymce.init({
-        extended_valid_elements: 'div[*],img[*]',
-        valid_children: ['+div[img]'],
+        extended_valid_elements: 'div[*],svg[*]',
+        valid_children: ['+div[svg]'],
         selector: '.${rndcls}',
         promotion: false,
         plugins: [ ${
@@ -197,4 +203,4 @@ const standardConfigFields = async () => {
   ];
 };
 
-module.exports = { standardConfigFields, initTiny };
+module.exports = { standardConfigFields, initTiny, encodeAmpersands };
