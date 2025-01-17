@@ -2,4 +2,4 @@
 
 Caveats:
 
-- When the diagrams.net option is enabled, Diagrams cannot be escaped in the ClickToTinyMCE fieldview for Cross Site Scripting (XSS) payloads.
+- When diagrams.net is enabled with the svg format, Diagrams cannot be escaped for Cross Site Scripting (XSS) payloads. In this case, show diagrams with unsafeNotEscaped HTML fieldview. You should not allow untrusted users to run the editor.

@@ -33,16 +33,90 @@ const diagramsUrl =
   "https://embed.diagrams.net/?embed=1&proto=json&spin=1&configure=1";
 const approvedOrigin = new URL(diagramsUrl).origin;
 
+// perhaps change it to a module
+let _uploadDrawings = null;
+let _drawingFormat = null;
 let _minRoleRead = null;
 
 function isDrawing(node) {
   return node.hasAttribute("drawio-diagram");
 }
 
+function load(drawingId) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: encodeURI(drawingId),
+      type: "GET",
+      xhrFields: {
+        responseType: "blob",
+      },
+      headers: {
+        "CSRF-Token": _sc_globalCsrf,
+      },
+      success: (data) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          return resolve(reader.result);
+        };
+        reader.onerror = (error) => {
+          return reject(error);
+        };
+        reader.readAsDataURL(data);
+      },
+      error: (request) => {
+        reject("Image load failed: " + request.responseText);
+      },
+    });
+  });
+}
+
+function base64PngToBlob(base64) {
+  const mimeString = "image/png";
+  const byteString = atob(base64.split(",")[1]);
+  const byteArray = new Uint8Array(byteString.length);
+  for (let i = 0; i < byteString.length; i++) {
+    byteArray[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([byteArray], { type: mimeString });
+}
+
+function upload(data, name) {
+  const formData = new FormData();
+  formData.append("file", base64PngToBlob(data), name + ".png");
+  formData.append("min_role_read", _minRoleRead);
+  return new Promise((resolve, reject) => {
+    $.ajax("/files/upload", {
+      type: "POST",
+      headers: {
+        "CSRF-Token": _sc_globalCsrf,
+      },
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (res) {
+        resolve(res.success.url);
+      },
+      error: function (request) {
+        reject("Image upload failed: " + request.responseText);
+      },
+    });
+  });
+}
+
 async function drawEventInit() {
   let xml = "";
-  if (currentNode)
-    xml = currentNode.querySelector("svg").getAttribute("content");
+  if (currentNode) {
+    if (_drawingFormat === "svg") {
+      xml = currentNode.querySelector("svg").getAttribute("content");
+    } else if (_drawingFormat === "png") {
+      if (_uploadDrawings)
+        xml = await load(currentNode.getAttribute("drawio-diagram"));
+      else {
+        const imgElem = currentNode.querySelector("img");
+        xml = imgElem.getAttribute("src");
+      }
+    }
+  }
   drawPostMessage({ action: "load", autosave: 1, xml });
 }
 
@@ -54,22 +128,59 @@ function drawEventClose() {
 function drawEventSave(message) {
   drawPostMessage({
     action: "export",
-    format: "xmlsvg",
+    format: _drawingFormat === "svg" ? "xmlsvg" : "xmlpng",
     xml: message.xml,
     spin: "Updating drawing",
   });
 }
 async function drawEventExport(message) {
-  const svg = atob(message.data.split(",")[1]);
-  if (currentNode) {
-    currentNode.innerHTML = svg;
-  } else {
-    const wrapId = `drawing-wrap-${Math.random().toString(16).slice(2)}`;
-    pageEditor.insertContent(
-      `<div drawio-diagram contenteditable="false" id="${wrapId}">${svg}</div>`
-    );
+  if (_drawingFormat === "svg") {
+    const svg = atob(message.data.split(",")[1]);
+    if (currentNode) {
+      currentNode.innerHTML = svg;
+    } else {
+      const wrapId = `drawing-wrap-${Math.random().toString(16).slice(2)}`;
+      pageEditor.insertContent(
+        `<div drawio-diagram contenteditable="false" id="${wrapId}">${svg}</div>`
+      );
+    }
+    drawEventClose();
+  } else if (_drawingFormat === "png") {
+    if (currentNode) {
+      const imgElem = currentNode.querySelector("img");
+      const id = imgElem.getAttribute("id");
+      const url = _uploadDrawings
+        ? await upload(message.data, id)
+        : message.data;
+      pageEditor.dom.setAttrib(imgElem, "src", url);
+      if (_uploadDrawings)
+        pageEditor.dom.setAttrib(currentNode, "drawio-diagram", url);
+      drawEventClose();
+    } else {
+      const imgId = `drawing-${Math.random().toString(16).slice(2)}`;
+      const wrapId = `drawing-wrap-${Math.random().toString(16).slice(2)}`;
+      pageEditor.insertContent(
+        `<div drawio-diagram contenteditable="false" id="${wrapId}"><img src="${message.data}" id="${imgId}"></div>`
+      );
+      if (_uploadDrawings) {
+        // wait 10 times 500 ms for the image to be uploaded and updated by tinymce
+        let tries = 10;
+        const interval = setInterval(() => {
+          const img = pageEditor.dom.get(imgId);
+          const src = img?.getAttribute("src");
+          if (src?.startsWith("/files/serve")) {
+            clearInterval(interval);
+            pageEditor.dom.setAttrib(wrapId, "drawio-diagram", src);
+            drawEventClose();
+          }
+          if (--tries === 0) {
+            clearInterval(interval);
+            drawEventClose();
+          }
+        }, 500);
+      } else drawEventClose();
+    }
   }
-  drawEventClose();
 }
 
 function drawEventConfigure() {
@@ -118,8 +229,10 @@ function showDrawingEditor(editor, selectedNode = null) {
   document.body.appendChild(iframe);
 }
 
-function getDrawioPlugin(minRoleRead) {
+function getDrawioPlugin(minRoleRead, uploadDrawings, drawingFormat) {
   _minRoleRead = minRoleRead;
+  _uploadDrawings = uploadDrawings;
+  _drawingFormat = drawingFormat;
   return (editor) => {
     editor.ui.registry.addIcon(
       "diagram",

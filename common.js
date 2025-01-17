@@ -40,12 +40,16 @@ const initTiny = (nm, rndcls, attrs) => `
         attrs?.include_drawio
           ? `window.tinymce.PluginManager.add('drawio', getDrawioPlugin(${
               attrs?.min_role_read || public_user_role
-            }));`
+            }, ${
+              typeof attrs?.folder === "string" &&
+              attrs.folder !== "Base64 encode" &&
+              attrs.folder !== ""
+            }, "${attrs.diagram_format}"  ));`
           : ""
       }
       const ed = await tinymce.init({
-        extended_valid_elements: 'div[*],svg[*]',
-        valid_children: ['+div[svg]'],
+        extended_valid_elements: 'div[*],img[*],svg[*]',
+        valid_children: ['+div[svg],+div[img]'],
         selector: '.${rndcls}',
         promotion: false,
         plugins: [ ${
@@ -86,7 +90,6 @@ const initTiny = (nm, rndcls, attrs) => `
           attrs.folder !== "Base64 encode" &&
           attrs.folder !== ""
             ? `images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
-              console.log(progress)
               const formData = new FormData();
               formData.append('file', blobInfo.blob(), blobInfo.filename());
               formData.append('min_role_read', ${
@@ -171,6 +174,14 @@ const standardConfigFields = async () => {
       label: "Include diagrams.net",
       type: "Bool",
       default: false,
+    },
+    {
+      name: "diagram_format",
+      label: "Diagram format",
+      type: "String",
+      default: "png",
+      showIf: { include_drawio: true },
+      attributes: { options: ["png", "svg"] },
     },
     {
       name: "minheight",
