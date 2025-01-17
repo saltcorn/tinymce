@@ -44,7 +44,7 @@ const initTiny = (nm, rndcls, attrs) => `
               typeof attrs?.folder === "string" &&
               attrs.folder !== "Base64 encode" &&
               attrs.folder !== ""
-            }, "${attrs.diagram_format}"  ));`
+            }, "${attrs.diagram_format || "png"}"  ));`
           : ""
       }
       const ed = await tinymce.init({
