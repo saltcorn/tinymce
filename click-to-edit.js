@@ -31,7 +31,7 @@ xss.whiteList.table = [
 xss.whiteList.span.push("style");
 xss.whiteList.p.push("style");
 xss.whiteList.td.push("style");
-xss.whiteList.div.push("style");
+xss.whiteList.div.push("style", "drawio-diagram", "id");
 
 const isdef = (x) => (typeof x === "undefined" || x === null ? false : true);
 
@@ -54,11 +54,12 @@ const clickToEdit = {
   run: (nm, v, attrs, cls, required, field) => {
     const rndcls = `tmce${Math.floor(Math.random() * 16777215).toString(16)}`;
 
-    const s = attrs?.include_drawio
-      ? v || ""
-      : xss(v || "")
-          .split("<blockquote>")
-          .join('<blockquote class="blockquote">');
+    const s =
+      attrs?.include_drawio && attrs.diagram_format === "svg"
+        ? v || ""
+        : xss(v || "")
+            .split("<blockquote>")
+            .join('<blockquote class="blockquote">');
     return div(
       { id: rndcls },
       textarea(
@@ -71,7 +72,9 @@ const clickToEdit = {
           "data-postprocess": "$e.text()",
         },
         text(
-          attrs?.include_drawio ? encodeAmpersands(v) : v || "",
+          attrs?.include_drawio && attrs.diagram_format === "svg"
+            ? encodeAmpersands(v)
+            : v || "",
           attrs?.include_drawio ? { div: ["drawio-diagram", "id"] } : undefined
         )
       ),

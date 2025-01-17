@@ -62,7 +62,9 @@ const TinyMCE = {
           "data-postprocess": "$e.text()",
         },
         text(
-          attrs?.include_drawio ? encodeAmpersands(v) : v || "",
+          attrs?.include_drawio && attrs.diagram_format === "svg"
+            ? encodeAmpersands(v)
+            : v || "",
           attrs?.include_drawio ? { div: ["drawio-diagram", "id"] } : undefined
         )
       ),
