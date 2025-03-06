@@ -1,1 +1,13 @@
-{ "Quick Toolbar": "Hurtig Toolbar" }
+{
+  "Quick Toolbar": "Hurtig Værktøjslinje",
+  "Toolbar": "Værktøjslinje",
+  "Status bar": "Statuslinje",
+  "Menu bar": "Menulinje",
+  "Auto-grow": "Automatisk vækst",
+  "Include diagrams.net": "Inkluder diagrams.net",
+  "Diagram format": "Diagramformat",
+  "Min height (px)": "Minimal højde (px)",
+  "Max height (px)": "Maksimal højde (px)",
+  "Folder for uploaded media files": "Mappe til uploadede mediefiler",
+  "Min role read files": "Min rolle læser filer"
+}

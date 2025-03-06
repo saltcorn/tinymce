@@ -1,0 +1,13 @@
+{
+  "Toolbar": "工具栏",
+  "Quick Toolbar": "快速工具栏",
+  "Status bar": "状态栏",
+  "Menu bar": "菜单栏",
+  "Auto-grow": "自动增长",
+  "Include diagrams.net": "包含 diagrams.net",
+  "Diagram format": "图表格式",
+  "Min height (px)": "最小高度（像素）",
+  "Max height (px)": "最大高度（像素）",
+  "Folder for uploaded media files": "用于上传媒体文件的文件夹",
+  "Min role read files": "我的角色读取文件"
+}
