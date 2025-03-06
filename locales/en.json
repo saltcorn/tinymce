@@ -1,1 +1,13 @@
-{ "Quick Toolbar": "Quick Toolbar" }
+{
+  "Toolbar": "Toolbar",
+  "Quick Toolbar": "Quick Toolbar",
+  "Status bar": "Status bar",
+  "Menu bar": "Menu bar",
+  "Auto-grow": "Auto-grow",
+  "Include diagrams.net": "Include diagrams.net",
+  "Diagram format": "Diagram format",
+  "Min height (px)": "Min height (px)",
+  "Max height (px)": "Max height (px)",
+  "Folder for uploaded media files": "Folder for uploaded media files",
+  "Min role read files": "Min role read files"
+}

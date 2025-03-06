@@ -139,7 +139,7 @@ const standardConfigFields = async (field, extra) => {
   return [
     {
       name: "toolbar",
-      label: "Toolbar",
+      label: __("Toolbar"),
       required: true,
       type: "String",
       attributes: { options: ["Standard", "Reduced", "Full"] },
@@ -151,12 +151,12 @@ const standardConfigFields = async (field, extra) => {
     },
     {
       name: "statusbar",
-      label: "Status bar",
+      label: __("Status bar"),
       type: "Bool",
     },
     {
       name: "menubar",
-      label: "Menu bar",
+      label: __("Menu bar"),
       type: "Bool",
     },
     /*{
@@ -167,19 +167,19 @@ const standardConfigFields = async (field, extra) => {
     },*/
     {
       name: "autogrow",
-      label: "Auto-grow",
+      label: __("Auto-grow"),
       type: "Bool",
     },
     {
       name: "include_drawio",
       // previously "drawio",
-      label: "Include diagrams.net",
+      label: __("Include diagrams.net"),
       type: "Bool",
       default: false,
     },
     {
       name: "diagram_format",
-      label: "Diagram format",
+      label: __("Diagram format"),
       type: "String",
       default: "png",
       showIf: { include_drawio: true },
@@ -187,19 +187,19 @@ const standardConfigFields = async (field, extra) => {
     },
     {
       name: "minheight",
-      label: "Min height (px)",
+      label: __("Min height (px)"),
       type: "Integer",
     },
     {
       name: "maxheight",
-      label: "Max height (px)",
+      label: __("Max height (px)"),
       type: "Integer",
     },
     ...(dirs
       ? [
           {
             name: "folder",
-            label: "Folder for uploaded media files",
+            label: __("Folder for uploaded media files"),
             type: "String",
             attributes: {
               options: folderOpts,
@@ -209,7 +209,7 @@ const standardConfigFields = async (field, extra) => {
       : []),
     {
       name: "min_role_read",
-      label: "Min role read files",
+      label: __("Min role read files"),
       input_type: "select",
       options: roles.map((r) => ({ value: r.id, label: r.role })),
     },
