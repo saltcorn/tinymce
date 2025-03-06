@@ -128,7 +128,9 @@ const initTiny = (nm, rndcls, attrs) => `
       })
         `;
 
-const standardConfigFields = async () => {
+const standardConfigFields = async (field, extra) => {
+  const __ = extra?.__ || ((s) => s);
+
   const dirs = File.allDirectories ? await File.allDirectories() : null;
   const folderOpts = [...dirs.map((d) => d.path_to_serve), "Base64 encode"];
   //console.log({ dirs, folderOpts });
@@ -144,7 +146,7 @@ const standardConfigFields = async () => {
     },
     {
       name: "quickbar",
-      label: "Quick Toolbar",
+      label: __("Quick Toolbar"),
       type: "Bool",
     },
     {
