@@ -32,6 +32,13 @@ const headers = [
     }/drawio_plugin.js`,
   },
   {
+    script: `/plugins/public/tinymce${
+      features?.version_plugin_serve_path
+        ? "@" + require("./package.json").version
+        : ""
+    }/tasklist_plugin.js`,
+  },
+  {
     css: `/plugins/public/tinymce${
       features?.version_plugin_serve_path
         ? "@" + require("./package.json").version
@@ -48,7 +55,9 @@ const TinyMCE = {
   configFields: standardConfigFields,
   run: (nm, v, attrs, cls) => {
     const rndcls = `tmce${Math.floor(Math.random() * 16777215).toString(16)}`;
-
+    const tasklistWhites = attrs?.include_tasklist
+      ? { ul: ["class"], li: ["class"] }
+      : {};
     return div(
       {
         class: [cls],
@@ -65,7 +74,9 @@ const TinyMCE = {
           attrs?.include_drawio && attrs.diagram_format === "svg"
             ? encodeAmpersands(v)
             : v || "",
-          attrs?.include_drawio ? { div: ["drawio-diagram", "id"] } : undefined
+          attrs?.include_drawio
+            ? { div: ["drawio-diagram", "id"], ...tasklistWhites }
+            : tasklistWhites
         )
       ),
       script(

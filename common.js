@@ -47,6 +47,11 @@ const initTiny = (nm, rndcls, attrs) => `
             }, "${attrs.diagram_format || "png"}"  ));`
           : ""
       }
+      ${
+        attrs?.include_tasklist
+          ? `window.tinymce.PluginManager.add('tasklist', getTasklistPlugin());`
+          : ""
+      }
       const ed = await tinymce.init({
         extended_valid_elements: 'div[*],img[*],svg[*]',
         valid_children: ['+div[svg],+div[img]'],
@@ -54,9 +59,11 @@ const initTiny = (nm, rndcls, attrs) => `
         promotion: false,
         plugins: [ ${
           attrs?.include_drawio ? `'drawio',` : ""
-        } 'link', 'fullscreen', 'charmap', 'table', 'lists', 'searchreplace',${
-  attrs?.autogrow ? `'autoresize',` : ""
-}${attrs?.quickbar ? `'quickbars',` : ""}],
+        } 'link', 'fullscreen', 'charmap', 'table', 'lists', 'searchreplace', ${
+  attrs?.include_tasklist ? "'tasklist'," : ""
+} ${attrs?.autogrow ? `'autoresize',` : ""}${
+  attrs?.quickbar ? `'quickbars',` : ""
+}],
         statusbar: ${!!attrs?.statusbar},        
         menubar: ${!!attrs?.menubar},
         ${
@@ -65,17 +72,23 @@ const initTiny = (nm, rndcls, attrs) => `
             : ""
         }
         skin: window._sc_lightmode==="dark" ? "tinymce-5-dark" : "tinymce-5",
-        content_css: window._sc_lightmode==="dark" ? "dark" : "default",
+        content_css: ['/plugins/public/tinymce@0.4.2/tiny_styles.css', window._sc_lightmode==="dark" ? "dark" : "default"],
         toolbar: '${
           attrs?.toolbar === "Reduced"
-            ? "undo redo | bold italic underline strikethrough | removeformat | link hr | bullist numlist | outdent indent | blockquote "
+            ? `undo redo | bold italic underline strikethrough | removeformat | link hr | bullist numlist ${
+                attrs?.include_tasklist ? "tasklist" : ""
+              } | outdent indent | blockquote `
             : attrs?.toolbar === "Full"
             ? `undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link | cut copy paste pastetext | searchreplace | table hr charmap | ${
                 attrs?.include_drawio ? "drawio | " : ""
-              }bullist numlist | alignnone alignleft aligncenter alignright alignjustify | outdent indent | blockquote | styles fontfamily fontsize fontsizeinput | fullscreen`
+              }bullist numlist ${
+                attrs?.include_tasklist ? "tasklist" : ""
+              } | alignnone alignleft aligncenter alignright alignjustify | outdent indent | blockquote | styles fontfamily fontsize fontsizeinput | fullscreen`
             : `undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link  | searchreplace | table hr charmap | ${
                 attrs?.include_drawio ? "drawio | " : ""
-              }bullist numlist | align | outdent indent | blockquote | fullscreen`
+              }bullist numlist ${
+                attrs?.include_tasklist ? "tasklist" : ""
+              } | align | outdent indent | blockquote | fullscreen`
         }',
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
@@ -174,6 +187,12 @@ const standardConfigFields = async (field, extra) => {
       name: "include_drawio",
       // previously "drawio",
       label: __("Include diagrams.net"),
+      type: "Bool",
+      default: false,
+    },
+    {
+      name: "include_tasklist",
+      label: __("Include task list"),
       type: "Bool",
       default: false,
     },
