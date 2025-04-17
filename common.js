@@ -72,7 +72,9 @@ const initTiny = (nm, rndcls, attrs) => `
             : ""
         }
         skin: window._sc_lightmode==="dark" ? "tinymce-5-dark" : "tinymce-5",
-        content_css: ['/plugins/public/tinymce@0.4.2/tiny_styles.css', window._sc_lightmode==="dark" ? "dark" : "default"],
+        content_css: ['/plugins/public/tinymce@${
+          require("./package.json").version
+        }/tiny_styles.css', window._sc_lightmode==="dark" ? "dark" : "default"],
         toolbar: '${
           attrs?.toolbar === "Reduced"
             ? `undo redo | bold italic underline strikethrough | removeformat | link hr | bullist numlist ${
