@@ -12,7 +12,7 @@ const {
   button,
 } = require("@saltcorn/markup/tags");
 
-const { features } = require("@saltcorn/data/db/state");
+const { features, getState } = require("@saltcorn/data/db/state");
 const public_user_role = features?.public_user_role || 10;
 
 const encodeAmpersands = (str) => {
@@ -21,6 +21,18 @@ const encodeAmpersands = (str) => {
     .replace(/&quot;/g, "&amp;quot;")
     .replace(/&lt;/g, "&amp;lt;")
     .replace(/&gt;/g, "&amp;gt;");
+};
+
+const bsBgColor = () => {
+  const state = getState();
+  if (state.plugin_cfgs) {
+    let anyBsThemeCfg = state.plugin_cfgs["any-bootstrap-theme"];
+    if (!anyBsThemeCfg)
+      anyBsThemeCfg = state.plugin_cfgs["@saltcorn/any-bootstrap-theme"];
+    if (anyBsThemeCfg?.backgroundColorDark)
+      return anyBsThemeCfg.backgroundColorDark;
+  }
+  return "";
 };
 
 const initTiny = (nm, rndcls, attrs) => `
@@ -52,6 +64,29 @@ const initTiny = (nm, rndcls, attrs) => `
           ? `window.tinymce.PluginManager.add('tasklist', getTasklistPlugin());`
           : ""
       }
+
+      // try tabler, then bootstrap, then default
+      const darkBg = window._sc_lightmode==="dark" ? 
+        (getComputedStyle(document.body).getPropertyValue('--tblr-body-bg').trim() || 
+         "${bsBgColor()}") : null; 
+
+      const getDarkStyle = () => {
+        return \`
+          .tox .tox-toolbar,.tox .tox-toolbar__overflow,.tox .tox-toolbar__primary {
+            background-image: none !important;
+            background-color: \${darkBg} !important;
+          }
+        \`;
+      };
+
+      function injectStyle() {
+        if (darkBg) {
+          const style = document.createElement('style');
+          style.textContent = getDarkStyle();
+          document.head.appendChild(style);
+        }
+      }
+
       const ed = await tinymce.init({
         extended_valid_elements: 'div[*],img[*],svg[*]',
         valid_children: ['+div[svg],+div[img]'],
@@ -75,6 +110,11 @@ const initTiny = (nm, rndcls, attrs) => `
         content_css: ['/plugins/public/tinymce@${
           require("./package.json").version
         }/tiny_styles.css', window._sc_lightmode==="dark" ? "dark" : "default"],
+        content_style: darkBg ? \`
+          body {
+            background-color: \${darkBg} !important;
+          }
+          \` : "",
         toolbar: '${
           attrs?.toolbar === "Reduced"
             ? `undo redo | bold italic underline strikethrough | removeformat | link hr | bullist numlist ${
@@ -98,6 +138,10 @@ const initTiny = (nm, rndcls, attrs) => `
           editor.on('Paste Change input Undo Redo', ()=>{
             tmceUpdateTextarea()
             changeDebounced()
+          });
+
+          editor.on('init', function () {
+            if (window._sc_lightmode==="dark") injectStyle();
           });
         },
         ${
