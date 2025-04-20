@@ -23,7 +23,7 @@ const encodeAmpersands = (str) => {
     .replace(/&gt;/g, "&amp;gt;");
 };
 
-const getDarkBg = () => {
+const bsBgColor = () => {
   const state = getState();
   if (state.plugin_cfgs) {
     let anyBsThemeCfg = state.plugin_cfgs["any-bootstrap-theme"];
@@ -65,7 +65,10 @@ const initTiny = (nm, rndcls, attrs) => `
           : ""
       }
 
-      const darkBg = window._sc_lightmode==="dark" ? "${getDarkBg()}" : null; 
+      // try tabler, then bootstrap, then default
+      const darkBg = window._sc_lightmode==="dark" ? 
+        (getComputedStyle(document.body).getPropertyValue('--tblr-body-bg').trim() || 
+         "${bsBgColor()}") : null; 
 
       const getDarkStyle = () => {
         return \`
