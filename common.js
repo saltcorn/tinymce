@@ -183,7 +183,8 @@ const initTiny = (nm, rndcls, attrs) => `
       }); 
     
       $('#input${text(nm)}_${rndcls}').on('set_form_field', (e)=>{
-        ed[0].setContent(e.target.value)
+        ed[0].setContent(e.target.value);
+        $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
       })
         `;
 
