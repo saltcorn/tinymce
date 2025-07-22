@@ -36,6 +36,9 @@ const bsBgColor = () => {
 };
 
 const initTiny = (nm, rndcls, attrs) => `
+      let initial = document.getElementById('input${text(nm)}_${rndcls}').value;
+      let unsafed = null;
+
       let tmceUpdateTextarea = ()=>{        
         $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
   nm
@@ -138,10 +141,43 @@ const initTiny = (nm, rndcls, attrs) => `
           editor.on('Paste Change input Undo Redo', ()=>{
             tmceUpdateTextarea()
             changeDebounced()
+            unsafed = document.getElementById('input${text(nm)}_${rndcls}').value;
           });
 
           editor.on('init', function () {
             if (window._sc_lightmode==="dark") injectStyle();
+
+            const doc = editor.getDoc();
+
+            const generateUniqueId = (tagName) =>
+              'tinymce-' + tagName.toLowerCase() + '-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+
+            const assignIdIfMissing = (node) => {
+              if (node.nodeType === 1 && !node.id) {
+                node.id = generateUniqueId(node.tagName);
+              }
+            };
+
+            const observer = new MutationObserver((mutationsList) => {
+              for (const mutation of mutationsList) {
+                mutation.addedNodes.forEach((node) => {
+                  if (node.nodeType === 1 && node.parentNode === doc.body)
+                    assignIdIfMissing(node);
+                  else if (node.nodeType === 3) {
+                    const parent = node.parentElement;
+                    if (parent?.nodeType === 1 && parent.parentNode === doc.body && !parent.id) {
+                      assignIdIfMissing(parent);
+                    }
+                  }
+                });
+              }
+            });
+
+            observer.observe(doc.body, {
+              childList: true,
+              subtree: true
+            });
+
           });
         },
         ${
@@ -183,8 +219,38 @@ const initTiny = (nm, rndcls, attrs) => `
       }); 
     
       $('#input${text(nm)}_${rndcls}').on('set_form_field', (e)=>{
+        ${
+          attrs?.merge_real_time_updates
+            ? `
+        if (unsafed !== null) {
+          try {
+            const incoming = e.target.value;
+            const merged = mergeVersions(initial, unsafed, incoming);
+            ed[0].setContent(merged);
+            $('textarea#input${text(nm)}_${rndcls}').html(merged).trigger('change');
+            unsafed = merged;
+            initial = incoming;
+            notifyAlert({
+              type: "success",
+              text: "Merged unsafed changes with a real-time update.",
+            });
+          }
+          catch (err) {
+            console.error('Error merging versions:', err);
+            notifyAlert({ 
+              type: "danger", 
+              text: "Unable to merge a real-time update: " + err.message
+            });
+          }
+        } else {
+          initial = e.target.value;
+          ed[0].setContent(e.target.value);
+          $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
+        }  `
+            : `
         ed[0].setContent(e.target.value);
-        $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
+        $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');`
+        }
       })
         `;
 
@@ -278,6 +344,13 @@ const standardConfigFields = async (field, extra) => {
       label: __("Min role read files"),
       input_type: "select",
       options: roles.map((r) => ({ value: r.id, label: r.role })),
+    },
+    {
+      name: "merge_real_time_updates",
+      label: __("Merge real-time updates"),
+      sublabel: __("Try to merge real-time updates with unsafed changes"),
+      type: "Bool",
+      default: true,
     },
   ];
 };
