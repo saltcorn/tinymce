@@ -350,7 +350,7 @@ const standardConfigFields = async (field, extra) => {
       label: __("Merge real-time updates"),
       sublabel: __("Try to merge real-time updates with unsafed changes"),
       type: "Bool",
-      default: true,
+      default: false,
     },
   ];
 };
