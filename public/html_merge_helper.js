@@ -102,7 +102,7 @@
         unsDelIndex++;
       }
 
-      let newIncInsKey = null;
+      let newIncInsKey = Infinity;
       if (incInsKey < Infinity) {
         const insertsBefore = countInsertsUntil(
           unsDelta,
@@ -112,7 +112,7 @@
         newIncInsKey = incInsKey + insertsBefore + conflictOffset;
       }
 
-      let newUnsInsKey = null;
+      let newUnsInsKey = Infinity;
       if (unsInsKey < Infinity) {
         const insertsBefore = countInsertsUntil(
           incDelta,
@@ -123,7 +123,7 @@
       }
 
       // conflict handling
-      if (newIncInsKey !== null && newUnsInsKey === newIncInsKey) {
+      if (newIncInsKey !== Infinity && newUnsInsKey === newIncInsKey) {
         const incEl = incDelta[incInsKey];
         const unsEl = unsDelta[unsInsKey];
         const incIsModify = isModify(incEl);
@@ -146,12 +146,12 @@
         conflictOffset++;
       }
       // incoming insert
-      else if (newIncInsKey !== null) {
+      else if (newIncInsKey < newUnsInsKey) {
         merged[newIncInsKey] = incDelta[incInsKey];
         incInsIndex++;
       }
       // unsafed insert
-      else if (newUnsInsKey !== null) {
+      else if (newUnsInsKey < newIncInsKey) {
         merged[newUnsInsKey] = unsDelta[unsInsKey];
         unsInsIndex++;
       }
