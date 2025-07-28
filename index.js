@@ -38,6 +38,28 @@ const headers = [
         : ""
     }/tasklist_plugin.js`,
   },
+
+  {
+    script: `/plugins/public/tinymce${
+      features?.version_plugin_serve_path
+        ? "@" + require("./package.json").version
+        : ""
+    }/jsondiffpatch.umd.min.js`,
+  },
+  {
+    script: `/plugins/public/tinymce${
+      features?.version_plugin_serve_path
+        ? "@" + require("./package.json").version
+        : ""
+    }/himalaya.js`,
+  },
+  {
+    script: `/plugins/public/tinymce${
+      features?.version_plugin_serve_path
+        ? "@" + require("./package.json").version
+        : ""
+    }/html_merge_helper.js`,
+  },
   {
     css: `/plugins/public/tinymce${
       features?.version_plugin_serve_path
@@ -58,6 +80,11 @@ const TinyMCE = {
     const tasklistWhites = attrs?.include_tasklist
       ? { ul: ["class"], li: ["class"] }
       : {};
+    const tags = Object.keys(require("xss").getDefaultWhiteList());
+    for (const tag of tags) {
+      const old = tasklistWhites[tag] || [];
+      tasklistWhites[tag] = ["id", ...old];
+    }
     return div(
       {
         class: [cls],
