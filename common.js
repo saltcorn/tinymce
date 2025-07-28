@@ -225,6 +225,8 @@ const initTiny = (nm, rndcls, attrs) => `
         if (unsafed !== null) {
           try {
             const incoming = e.target.value;
+            unsafed = document.getElementById('input${text(nm)}_${rndcls}').value;
+            if (incoming === unsafed) return;
             const merged = mergeVersions(initial, unsafed, incoming);
             ed[0].setContent(merged);
             $('textarea#input${text(nm)}_${rndcls}').html(merged).trigger('change');
