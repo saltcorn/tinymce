@@ -35,20 +35,24 @@ const bsBgColor = () => {
   return "";
 };
 
-const initTiny = (nm, rndcls, attrs) => `
+const initTiny = (nm, rndcls, attrs, inautosave) => `
       let initial = document.getElementById('input${text(nm)}_${rndcls}').value;
       let unsafed = null;
 
       let tmceUpdateTextarea = ()=>{        
         $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
-  nm
-)}_${rndcls}").getContent());
-      } 
-      let tmceOnChange = ()=>{        
+          nm,
+        )}_${rndcls}").getContent());
+      }
+      let lastChange = null;
+      let tmceOnChange = ()=>{
+        const newVal = tinymce.get("input${text(nm)}_${rndcls}").getContent();
         $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
-  nm
-)}_${rndcls}").getContent());
-        $('textarea#input${text(nm)}_${rndcls}').trigger('change');
+          nm,
+        )}_${rndcls}").getContent());
+        if (newVal !== lastChange) 
+          $('textarea#input${text(nm)}_${rndcls}').trigger('change');
+        lastChange = newVal;
       } 
       let changeDebounced = $.debounce ? $.debounce(tmceOnChange, 500, null,true) : tmceOnChange;
       ${
@@ -218,9 +222,9 @@ const initTiny = (nm, rndcls, attrs) => `
         }
       }); 
     
-      $('#input${text(nm)}_${rndcls}').on('set_form_field', (e)=>{
+      $('#input${text(nm)}_${rndcls}').on('set_form_field', (e, data)=>{
         ${
-          attrs?.merge_real_time_updates
+          attrs?.merge_real_time_updates && !inautosave
             ? `
         if (unsafed !== null) {
           try {
@@ -247,11 +251,15 @@ const initTiny = (nm, rndcls, attrs) => `
         } else {
           initial = e.target.value;
           ed[0].setContent(e.target.value);
-          $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
+          if (!data?.no_onchange) {
+            $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
+          }
         }  `
             : `
         ed[0].setContent(e.target.value);
-        $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');`
+        if (!data?.no_onchange) {
+          $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
+        }`
         }
       })
         `;
