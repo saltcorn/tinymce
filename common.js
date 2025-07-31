@@ -95,8 +95,8 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
       }
 
       const ed = await tinymce.init({
-        extended_valid_elements: 'div[*],img[*],svg[*]',
-        valid_children: ['+div[svg],+div[img]'],
+        extended_valid_elements: 'div[*],img[*],svg[*],p[class|style]',
+        valid_children: ['+div[svg],+div[img],p[class|style]'],
         selector: '.${rndcls}',
         promotion: false,
         plugins: [ ${
@@ -232,7 +232,9 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
             unsafed = document.getElementById('input${text(nm)}_${rndcls}').value;
             if (incoming === unsafed) return;
             const merged = mergeVersions(initial, unsafed, incoming);
+            const bookmark = ed[0].selection.getBookmark(2);    
             ed[0].setContent(merged);
+            ed[0].selection.moveToBookmark(bookmark);
             $('textarea#input${text(nm)}_${rndcls}').html(merged).trigger('change');
             unsafed = merged;
             initial = incoming;
@@ -250,13 +252,17 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
           }
         } else {
           initial = e.target.value;
+          const bookmark = ed[0].selection.getBookmark(2);    
           ed[0].setContent(e.target.value);
+          ed[0].selection.moveToBookmark(bookmark);
           if (!data?.no_onchange) {
             $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
           }
         }  `
             : `
+        const bookmark = ed[0].selection.getBookmark(2);    
         ed[0].setContent(e.target.value);
+        ed[0].selection.moveToBookmark(bookmark);
         if (!data?.no_onchange) {
           $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
         }`
