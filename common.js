@@ -95,7 +95,7 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
       }
 
       const ed = await tinymce.init({
-        extended_valid_elements: 'div[*],img[*],svg[*],p[class|style]',
+        extended_valid_elements: 'div[*],img[*],svg[*],p[class|style|id]',
         valid_children: ['+div[svg],+div[img],p[class|style]'],
         selector: '.${rndcls}',
         promotion: false,
@@ -229,7 +229,6 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
         if (unsafed !== null) {
           try {
             const incoming = e.target.value;
-            unsafed = document.getElementById('input${text(nm)}_${rndcls}').value;
             if (incoming === unsafed) return;
             const merged = mergeVersions(initial, unsafed, incoming);
             const bookmark = ed[0].selection.getBookmark(2);    
@@ -252,19 +251,23 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
           }
         } else {
           initial = e.target.value;
+          if (e.target.value !== ed[0].getContent()) {
+            const bookmark = ed[0].selection.getBookmark(2);    
+            ed[0].setContent(e.target.value);
+            ed[0].selection.moveToBookmark(bookmark);
+            if (!data?.no_onchange) {
+              $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
+            }
+          }
+        }  `
+            : `
+        if (e.target.value !== ed[0].getContent()) {
           const bookmark = ed[0].selection.getBookmark(2);    
           ed[0].setContent(e.target.value);
           ed[0].selection.moveToBookmark(bookmark);
           if (!data?.no_onchange) {
             $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
           }
-        }  `
-            : `
-        const bookmark = ed[0].selection.getBookmark(2);    
-        ed[0].setContent(e.target.value);
-        ed[0].selection.moveToBookmark(bookmark);
-        if (!data?.no_onchange) {
-          $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
         }`
         }
       })
