@@ -65,7 +65,9 @@
     let incDelKey;
     let unsDelKey;
     let conflictOffset = 0;
+    let index = 0;
     do {
+      if (index++ > 100000) throw new Error("Unable to merge");
       unsInsKey =
         unsInsIndex < unsInsKeys.length ? unsInsKeys[unsInsIndex] : Infinity;
       incInsKey =
