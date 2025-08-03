@@ -150,38 +150,6 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
 
           editor.on('init', function () {
             if (window._sc_lightmode==="dark") injectStyle();
-
-            const doc = editor.getDoc();
-
-            const generateUniqueId = (tagName) =>
-              'tinymce-' + tagName.toLowerCase() + '-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-
-            const assignIdIfMissing = (node) => {
-              if (node.nodeType === 1 && !node.id) {
-                node.id = generateUniqueId(node.tagName);
-              }
-            };
-
-            const observer = new MutationObserver((mutationsList) => {
-              for (const mutation of mutationsList) {
-                mutation.addedNodes.forEach((node) => {
-                  if (node.nodeType === 1 && node.parentNode === doc.body)
-                    assignIdIfMissing(node);
-                  else if (node.nodeType === 3) {
-                    const parent = node.parentElement;
-                    if (parent?.nodeType === 1 && parent.parentNode === doc.body && !parent.id) {
-                      assignIdIfMissing(parent);
-                    }
-                  }
-                });
-              }
-            });
-
-            observer.observe(doc.body, {
-              childList: true,
-              subtree: true
-            });
-
           });
         },
         ${

@@ -80,11 +80,6 @@ const TinyMCE = {
     const tasklistWhites = attrs?.include_tasklist
       ? { ul: ["class"], li: ["class"] }
       : {};
-    const tags = Object.keys(require("xss").getDefaultWhiteList());
-    for (const tag of tags) {
-      const old = tasklistWhites[tag] || [];
-      tasklistWhites[tag] = ["id", ...old];
-    }
     return div(
       {
         class: [cls],
