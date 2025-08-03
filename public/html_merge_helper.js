@@ -96,12 +96,12 @@
         const insertsBefore = notModifiesUntil(
           unsDelta,
           unsInsKeys,
-          incInsKey + unsInsIndex,
+          incInsKey + unsInsIndex
         );
         const deletesBefore = notModifiesUntil(
           unsDelta,
           unsDelKeys,
-          incInsKey + unsInsIndex,
+          incInsKey + unsInsIndex - incInsIndex
         );
         newIncInsKey =
           incInsKey + insertsBefore - deletesBefore + conflictOffset;
@@ -112,12 +112,12 @@
         const insertsBefore = notModifiesUntil(
           incDelta,
           incInsKeys,
-          unsInsKey + incInsIndex,
+          unsInsKey + incInsIndex
         );
         const deletesBefore = notModifiesUntil(
           incDelta,
           incDelKeys,
-          unsInsKey + incInsIndex,
+          unsInsKey + incInsIndex - unsInsIndex
         );
         newUnsInsKey =
           unsInsKey + insertsBefore - deletesBefore - conflictOffset;
@@ -148,11 +148,13 @@
       }
       // incoming insert
       else if (newIncInsKey < newUnsInsKey) {
+        if (merged[newIncInsKey]) throw new Error("Insert conflict");
         merged[newIncInsKey] = incDelta[incInsKey];
         incInsIndex++;
       }
       // unsafed insert
       else if (newUnsInsKey < newIncInsKey) {
+        if (merged[newUnsInsKey]) throw new Error("Insert conflict");
         merged[newUnsInsKey] = unsDelta[unsInsKey];
         unsInsIndex++;
       }
