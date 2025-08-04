@@ -75,16 +75,11 @@ const TinyMCE = {
   blockDisplay: true,
   handlesTextStyle: true,
   configFields: standardConfigFields,
-  run: (nm, v, attrs, cls) => {
+  run: (nm, v, attrs, cls, required, header) => {
     const rndcls = `tmce${Math.floor(Math.random() * 16777215).toString(16)}`;
     const tasklistWhites = attrs?.include_tasklist
       ? { ul: ["class"], li: ["class"] }
       : {};
-    const tags = Object.keys(require("xss").getDefaultWhiteList());
-    for (const tag of tags) {
-      const old = tasklistWhites[tag] || [];
-      tasklistWhites[tag] = ["id", ...old];
-    }
     return div(
       {
         class: [cls],
@@ -103,14 +98,14 @@ const TinyMCE = {
             : v || "",
           attrs?.include_drawio
             ? { div: ["drawio-diagram", "id"], ...tasklistWhites }
-            : tasklistWhites
-        )
+            : tasklistWhites,
+        ),
       ),
       script(
         domReady(`setTimeout(async ()=>{      
-          ${initTiny(nm, rndcls, attrs)}
-    },0)`)
-      )
+          ${initTiny(nm, rndcls, attrs, header?.in_auto_save)}
+    },0)`),
+      ),
     );
   },
 };

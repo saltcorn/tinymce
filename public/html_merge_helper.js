@@ -2,20 +2,15 @@
   const { parse, stringify } = window.himalaya;
   const jsondiffpatch = window.jsondiffpatch;
 
-  const isModify = (obj) => {
-    let hasInsert = false;
-    let hasDelete = false;
-    for (const [childKey, childVal] of Object.entries(obj.children || {})) {
-      if (childKey === "_t") continue;
-      if (childKey.startsWith("_")) hasDelete = true;
-      else hasInsert = true;
-    }
-    return hasInsert && hasDelete;
+  const isModify = (delta, key) => {
+    const insertEl = delta[key];
+    const deleteEl = delta[`_${key}`];
+    return !!insertEl && !!deleteEl;
   };
+
   const diffpatch = jsondiffpatch.create({
     objectHash: function (obj) {
-      const idAttr = obj.attributes?.find((attr) => attr.key === "id");
-      return idAttr ? idAttr.value : JSON.stringify(obj);
+      return JSON.stringify(obj);
     },
     arrays: {
       detectMove: false,
@@ -36,12 +31,12 @@
       .filter((key) => !isNaN(key))
       .sort((a, b) => a - b);
 
-  const countInsertsUntil = (delta, keys, index) => {
+  const notModifiesUntil = (delta, keys, index) => {
     let count = 0;
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       if (key >= index) break;
-      if (!isModify(delta[key])) count++;
+      if (!isModify(delta, key)) count++;
     }
     return count;
   };
@@ -65,7 +60,9 @@
     let incDelKey;
     let unsDelKey;
     let conflictOffset = 0;
+    let index = 0;
     do {
+      if (index++ > 100000) throw new Error("Unable to merge");
       unsInsKey =
         unsInsIndex < unsInsKeys.length ? unsInsKeys[unsInsIndex] : Infinity;
       incInsKey =
@@ -77,11 +74,7 @@
 
       // incoming delete
       if (incDelKey < unsDelKey && incDelKey <= incInsKey) {
-        const insertsBefore = countInsertsUntil(
-          incDelta,
-          incInsKeys,
-          incDelKey,
-        );
+        const insertsBefore = notModifiesUntil(incDelta, incInsKeys, incDelKey);
         const newKey = `_${incDelKey - insertsBefore}`;
         if (merged[newKey]) throw new Error("Delete conflict");
 
@@ -90,11 +83,7 @@
       }
       // unsafed delete
       else if (unsDelKey < incDelKey && unsDelKey <= unsInsKey) {
-        const insertsBefore = countInsertsUntil(
-          unsDelta,
-          unsInsKeys,
-          unsDelKey,
-        );
+        const insertsBefore = notModifiesUntil(unsDelta, unsInsKeys, unsDelKey);
         const newKey = `_${unsDelKey - insertsBefore}`;
         if (merged[newKey]) throw new Error("Delete conflict");
 
@@ -104,30 +93,42 @@
 
       let newIncInsKey = Infinity;
       if (incInsKey < Infinity) {
-        const insertsBefore = countInsertsUntil(
+        const insertsBefore = notModifiesUntil(
           unsDelta,
           unsInsKeys,
-          incInsKey + unsInsIndex,
+          incInsKey + unsInsIndex
         );
-        newIncInsKey = incInsKey + insertsBefore + conflictOffset;
+        const deletesBefore = notModifiesUntil(
+          unsDelta,
+          unsDelKeys,
+          incInsKey + unsInsIndex - incInsIndex
+        );
+        newIncInsKey =
+          incInsKey + insertsBefore - deletesBefore + conflictOffset;
       }
 
       let newUnsInsKey = Infinity;
       if (unsInsKey < Infinity) {
-        const insertsBefore = countInsertsUntil(
+        const insertsBefore = notModifiesUntil(
           incDelta,
           incInsKeys,
-          unsInsKey + incInsIndex,
+          unsInsKey + incInsIndex
         );
-        newUnsInsKey = unsInsKey + insertsBefore + conflictOffset;
+        const deletesBefore = notModifiesUntil(
+          incDelta,
+          incDelKeys,
+          unsInsKey + incInsIndex - unsInsIndex
+        );
+        newUnsInsKey =
+          unsInsKey + insertsBefore - deletesBefore - conflictOffset;
       }
 
       // conflict handling
       if (newIncInsKey !== Infinity && newUnsInsKey === newIncInsKey) {
         const incEl = incDelta[incInsKey];
         const unsEl = unsDelta[unsInsKey];
-        const incIsModify = isModify(incEl);
-        const unsIsModify = isModify(unsEl);
+        const incIsModify = isModify(incDelta, incInsKey);
+        const unsIsModify = isModify(unsDelta, unsInsKey);
         if (incIsModify && unsIsModify) throw new Error("Modify conflict");
         // put the insert before the modify
         else if (!incIsModify && unsIsModify) {
@@ -147,11 +148,13 @@
       }
       // incoming insert
       else if (newIncInsKey < newUnsInsKey) {
+        if (merged[newIncInsKey]) throw new Error("Insert conflict");
         merged[newIncInsKey] = incDelta[incInsKey];
         incInsIndex++;
       }
       // unsafed insert
       else if (newUnsInsKey < newIncInsKey) {
+        if (merged[newUnsInsKey]) throw new Error("Insert conflict");
         merged[newUnsInsKey] = unsDelta[unsInsKey];
         unsInsIndex++;
       }
