@@ -13,6 +13,7 @@ const {
 } = require("@saltcorn/markup/tags");
 
 const { features, getState } = require("@saltcorn/data/db/state");
+const db = require("@saltcorn/data/db");
 const public_user_role = features?.public_user_role || 10;
 
 const encodeAmpersands = (str) => {
@@ -25,6 +26,11 @@ const encodeAmpersands = (str) => {
 
 const bsBgColor = () => {
   const state = getState();
+  const ctx = db.getRequestContext?.();
+  const layout = state.getLayout(ctx?.req?.user);
+  if (layout?.config?.backgroundColorDark)
+    return layout?.config?.backgroundColorDark;
+
   if (state.plugin_cfgs) {
     let anyBsThemeCfg = state.plugin_cfgs["any-bootstrap-theme"];
     if (!anyBsThemeCfg)
@@ -41,15 +47,15 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
 
       let tmceUpdateTextarea = ()=>{        
         $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
-          nm,
-        )}_${rndcls}").getContent());
+  nm
+)}_${rndcls}").getContent());
       }
       let lastChange = null;
       let tmceOnChange = ()=>{
         const newVal = tinymce.get("input${text(nm)}_${rndcls}").getContent();
         $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
-          nm,
-        )}_${rndcls}").getContent());
+  nm
+)}_${rndcls}").getContent());
         if (newVal !== lastChange) 
           $('textarea#input${text(nm)}_${rndcls}').trigger('change');
         lastChange = newVal;
@@ -145,7 +151,9 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
           editor.on('Paste Change input Undo Redo', ()=>{
             tmceUpdateTextarea()
             changeDebounced()
-            unsafed = document.getElementById('input${text(nm)}_${rndcls}').value;
+            unsafed = document.getElementById('input${text(
+              nm
+            )}_${rndcls}').value;
           });
 
           editor.on('init', function () {
@@ -202,7 +210,9 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
             const bookmark = ed[0].selection.getBookmark(2);    
             ed[0].setContent(merged);
             ed[0].selection.moveToBookmark(bookmark);
-            $('textarea#input${text(nm)}_${rndcls}').html(merged).trigger('change');
+            $('textarea#input${text(
+              nm
+            )}_${rndcls}').html(merged).trigger('change');
             unsafed = merged;
             initial = incoming;
             notifyAlert({
@@ -224,7 +234,9 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
             ed[0].setContent(e.target.value);
             ed[0].selection.moveToBookmark(bookmark);
             if (!data?.no_onchange) {
-              $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
+              $('textarea#input${text(
+                nm
+              )}_${rndcls}').html(e.target.value).trigger('change');
             }
           }
         }  `
@@ -234,7 +246,9 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
           ed[0].setContent(e.target.value);
           ed[0].selection.moveToBookmark(bookmark);
           if (!data?.no_onchange) {
-            $('textarea#input${text(nm)}_${rndcls}').html(e.target.value).trigger('change');
+            $('textarea#input${text(
+              nm
+            )}_${rndcls}').html(e.target.value).trigger('change');
           }
         }`
         }
