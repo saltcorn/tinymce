@@ -46,14 +46,14 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
       let unsafed = null;
 
       let tmceUpdateTextarea = ()=>{        
-        $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
+        $('textarea#input${text(nm)}_${rndcls}').val(tinymce.get("input${text(
   nm
 )}_${rndcls}").getContent());
       }
       let lastChange = null;
       let tmceOnChange = ()=>{
         const newVal = tinymce.get("input${text(nm)}_${rndcls}").getContent();
-        $('textarea#input${text(nm)}_${rndcls}').html(tinymce.get("input${text(
+        $('textarea#input${text(nm)}_${rndcls}').val(tinymce.get("input${text(
   nm
 )}_${rndcls}").getContent());
         if (newVal !== lastChange) 
