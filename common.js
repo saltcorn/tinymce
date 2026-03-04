@@ -45,17 +45,16 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
       let initial = document.getElementById('input${text(nm)}_${rndcls}').value;
       let unsafed = null;
 
-      let tmceUpdateTextarea = ()=>{        
-        $('textarea#input${text(nm)}_${rndcls}').val(tinymce.get("input${text(
-  nm
-)}_${rndcls}").getContent());
+      let tmceUpdateTextarea = ()=>{
+        let setToVal = tinymce.get("input${text(nm)}_${rndcls}").getContent();
+        $('textarea#input${text(nm)}_${rndcls}').val(setToVal);
+        $('textarea#input${text(nm)}_${rndcls}').html(setToVal);
       }
       let lastChange = null;
       let tmceOnChange = ()=>{
         const newVal = tinymce.get("input${text(nm)}_${rndcls}").getContent();
-        $('textarea#input${text(nm)}_${rndcls}').val(tinymce.get("input${text(
-  nm
-)}_${rndcls}").getContent());
+        $('textarea#input${text(nm)}_${rndcls}').val(newVal);
+        $('textarea#input${text(nm)}_${rndcls}').html(newVal);
         if (newVal !== lastChange) 
           $('textarea#input${text(nm)}_${rndcls}').trigger('change');
         lastChange = newVal;
@@ -108,10 +107,10 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
         plugins: [ ${
           attrs?.include_drawio ? `'drawio',` : ""
         } 'link', 'fullscreen', 'charmap', 'table', 'lists', 'searchreplace', ${
-  attrs?.include_tasklist ? "'tasklist'," : ""
-} ${attrs?.autogrow ? `'autoresize',` : ""}${
-  attrs?.quickbar ? `'quickbars',` : ""
-}],
+          attrs?.include_tasklist ? "'tasklist'," : ""
+        } ${attrs?.autogrow ? `'autoresize',` : ""}${
+          attrs?.quickbar ? `'quickbars',` : ""
+        }],
         statusbar: ${!!attrs?.statusbar},        
         menubar: ${!!attrs?.menubar},
         ${
@@ -134,16 +133,16 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
                 attrs?.include_tasklist ? "tasklist" : ""
               } | outdent indent | blockquote `
             : attrs?.toolbar === "Full"
-            ? `undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link | cut copy paste pastetext | searchreplace | table hr charmap | ${
-                attrs?.include_drawio ? "drawio | " : ""
-              }bullist numlist ${
-                attrs?.include_tasklist ? "tasklist" : ""
-              } | alignnone alignleft aligncenter alignright alignjustify | outdent indent | blockquote | styles fontfamily fontsize fontsizeinput | fullscreen`
-            : `undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link  | searchreplace | table hr charmap | ${
-                attrs?.include_drawio ? "drawio | " : ""
-              }bullist numlist ${
-                attrs?.include_tasklist ? "tasklist" : ""
-              } | align | outdent indent | blockquote | fullscreen`
+              ? `undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link | cut copy paste pastetext | searchreplace | table hr charmap | ${
+                  attrs?.include_drawio ? "drawio | " : ""
+                }bullist numlist ${
+                  attrs?.include_tasklist ? "tasklist" : ""
+                } | alignnone alignleft aligncenter alignright alignjustify | outdent indent | blockquote | styles fontfamily fontsize fontsizeinput | fullscreen`
+              : `undo redo | bold italic underline strikethrough | forecolor backcolor | removeformat | link  | searchreplace | table hr charmap | ${
+                  attrs?.include_drawio ? "drawio | " : ""
+                }bullist numlist ${
+                  attrs?.include_tasklist ? "tasklist" : ""
+                } | align | outdent indent | blockquote | fullscreen`
         }',
         ${attrs?.minheight ? `min_height: ${attrs.minheight},` : ""}
         ${attrs?.maxheight ? `max_height: ${attrs.maxheight},` : ""}
@@ -152,7 +151,7 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
             tmceUpdateTextarea()
             changeDebounced()
             unsafed = document.getElementById('input${text(
-              nm
+              nm,
             )}_${rndcls}').value;
           });
 
@@ -211,7 +210,7 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
             ed[0].setContent(merged);
             ed[0].selection.moveToBookmark(bookmark);
             $('textarea#input${text(
-              nm
+              nm,
             )}_${rndcls}').html(merged).trigger('change');
             unsafed = merged;
             initial = incoming;
@@ -235,7 +234,7 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
             ed[0].selection.moveToBookmark(bookmark);
             if (!data?.no_onchange) {
               $('textarea#input${text(
-                nm
+                nm,
               )}_${rndcls}').html(e.target.value).trigger('change');
             }
           }
@@ -247,7 +246,7 @@ const initTiny = (nm, rndcls, attrs, inautosave) => `
           ed[0].selection.moveToBookmark(bookmark);
           if (!data?.no_onchange) {
             $('textarea#input${text(
-              nm
+              nm,
             )}_${rndcls}').html(e.target.value).trigger('change');
           }
         }`
