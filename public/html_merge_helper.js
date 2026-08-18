@@ -90,6 +90,37 @@
         merged[newKey] = unsDelta[`_${unsDelKey}`];
         unsDelIndex++;
       }
+      // both sides delete the same original position
+      else if (
+        incDelKey === unsDelKey &&
+        incDelKey < Infinity &&
+        incDelKey <= incInsKey &&
+        unsDelKey <= unsInsKey
+      ) {
+        const incIsModify = isModify(incDelta, incDelKey);
+        const unsIsModify = isModify(unsDelta, unsDelKey);
+        if (incIsModify !== unsIsModify) {
+          // one side edited this content, the other deleted it outright
+          throw new Error("Delete conflict");
+        } else if (!incIsModify && !unsIsModify) {
+          // identical delete on both sides - merge into a single delete
+          const insertsBefore = notModifiesUntil(
+            incDelta,
+            incInsKeys,
+            incDelKey
+          );
+          const newKey = `_${incDelKey - insertsBefore}`;
+          if (merged[newKey]) throw new Error("Delete conflict");
+
+          merged[newKey] = incDelta[`_${incDelKey}`];
+          incDelIndex++;
+          unsDelIndex++;
+        }
+        // else: both sides modified this position (delete+insert) - leave
+        // the delete keys for the insert-conflict handling below, which
+        // sees the matching insert keys here too and reports a proper
+        // "Modify conflict" instead
+      }
 
       let newIncInsKey = Infinity;
       if (incInsKey < Infinity) {
@@ -134,17 +165,22 @@
         else if (!incIsModify && unsIsModify) {
           merged[newIncInsKey] = incEl;
           merged[newUnsInsKey + 1] = unsEl;
+          conflictOffset++;
         } else if (incIsModify && !unsIsModify) {
           merged[newIncInsKey + 1] = unsEl;
           merged[newUnsInsKey] = incEl;
+          conflictOffset++;
+        } else if (JSON.stringify(incEl) === JSON.stringify(unsEl)) {
+          // identical insert on both sides - keep a single copy
+          merged[newIncInsKey] = incEl;
         } else {
-          // two inserts, take incoming first
+          // two different inserts, take incoming first
           merged[newIncInsKey] = incEl;
           merged[newUnsInsKey + 1] = unsEl;
+          conflictOffset++;
         }
         incInsIndex++;
         unsInsIndex++;
-        conflictOffset++;
       }
       // incoming insert
       else if (newIncInsKey < newUnsInsKey) {

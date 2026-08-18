@@ -10,11 +10,8 @@
   "author": "Tom Nielsen",
   "license": "MIT",
   "repository": "github:saltcorn/tinymce",
-  "jest": {
-    "testEnvironment": "node"
-  },
   "scripts": {
-    "test": "jest"
+    "test": "node --test test/*.test.js"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
